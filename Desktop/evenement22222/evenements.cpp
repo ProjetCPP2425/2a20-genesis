@@ -42,10 +42,9 @@ bool evenement::ajouter(){
     query.bindValue(":capacite" , capacite);
     query.bindValue(":sponsors" , sponsors);
     query.bindValue(":budget" , budget);
-    // Execute the query
+
     if (!query.exec())
     {
-        // Log the error message if the query fails
         qDebug() << "Insert query failed:" << query.lastError().text();
         return false;
     }
@@ -77,6 +76,7 @@ bool evenement::modifier(QString old_nom)
 QSqlQueryModel* evenement::afficher(){
     QSqlQueryModel * model=new QSqlQueryModel();
     model->setQuery("SELECT * FROM IMENE.EVENEMENTS");
+
     model->setHeaderData(0,Qt::Horizontal,QObject::tr("ID_EV"));
     model->setHeaderData(1,Qt::Horizontal,QObject::tr("NOM"));
     model->setHeaderData(2,Qt::Horizontal,QObject::tr("DATE_DEBUT"));
@@ -89,16 +89,13 @@ QSqlQueryModel* evenement::afficher(){
     return model;
 }
 
-bool evenement::supprimer(QString event_name) {
+bool evenement::supprimer(QString nom) {
     QSqlQuery query;
 
-    // Prepare the delete query
     query.prepare("DELETE FROM IMENE.EVENEMENTS WHERE NOM = :nom");
 
-    // Bind the event name
-    query.bindValue(":nom", event_name);
+    query.bindValue(":nom", nom);
 
-    // Execute the query
     if (!query.exec()) {
         qDebug() << "Delete query failed:" << query.lastError().text();
         return false;

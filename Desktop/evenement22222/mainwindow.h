@@ -18,6 +18,9 @@ public:
     ~MainWindow();
 
 private slots:
+    void onRowSelected();
+    void onSupprimerClicked();
+
     void on_pushbutton_ajouter_2_clicked();
 
     void on_pushButton_180_clicked();

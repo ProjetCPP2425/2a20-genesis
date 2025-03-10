@@ -971,7 +971,7 @@ QComboBox QAbstractItemView::item {
        <x>20</x>
        <y>290</y>
        <width>851</width>
-       <height>281</height>
+       <height>391</height>
       </rect>
      </property>
      <property name="styleSheet">

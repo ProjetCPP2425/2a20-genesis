@@ -1,4 +1,4 @@
-#ifndef EVENEMENTS_H
+    #ifndef EVENEMENTS_H
 #define EVENEMENTS_H
 #include <QString>
 #include <QSqlQuery>
@@ -37,8 +37,7 @@ public :
     float Getbudget() { return budget; }
     void Setbudget(float val) { budget = val; }
 
-    bool supprimer(QString event_name);
-    bool supprimer();
+    bool supprimer(QString nom);
     bool modifier();
     bool ajouter();
     QSqlQueryModel* afficher();

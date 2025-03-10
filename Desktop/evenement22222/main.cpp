@@ -8,10 +8,6 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // Check available SQL drivers
-    qDebug() << "Available SQL Drivers:" << QSqlDatabase::drivers();
-
-    //MainWindow w;
     Connection c;
     bool test = c.createConnection();
 
