@@ -18,6 +18,7 @@ HEADERS += \
     Connection.h \
     evenements.h \
     mainwindow.h
+	s
 
 FORMS += \
     mainwindow.ui
