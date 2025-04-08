@@ -5,6 +5,10 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT += charts
+QT += printsupport
+QT += core gui widgets
+QT += svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,21 +27,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
+QT += charts
 
 SOURCES += \
         Connection.cpp \
         main.cpp \
         mainwindow.cpp \
-        ressource.cpp
+        qrcode.cpp \
+        ressource.cpp \
+        statistiquesdialog.cpp \
+        qrcodegen.cpp
 
 HEADERS += \
         Connection.h \
         mainwindow.h \
-        ressource.h
+        qrcode.h \
+        ressource.h \
+        statistiquesdialog.h \
+        qrcodegen.hpp
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        statistiquesdialog.ui
 QT+=sql
+INCLUDEPATH += .
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
