@@ -26,11 +26,14 @@ private slots:
     void ajouterRessource();
     void modifierRessource();
     void supprimerRessource();
-    void calculerStatistiques();
     void exporterPDF();
     void TrierParDisponibilite();
     void on_comboBox_tri_currentTextChanged(const QString &etat);
     void afficherDatesMaintenance();
+    void on_pushButton_qr_clicked();
+    void appliquerTri();
+    void trierTableParColonne(int colonne, Qt::SortOrder ordre);
+    void afficherStatistiquesCamembert();
 
 private:
     Ui::MainWindow *ui;

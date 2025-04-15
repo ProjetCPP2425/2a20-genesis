@@ -168,7 +168,7 @@ QLineEdit#searchBar:focus {
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>270</x>
       <y>10</y>
       <width>291</width>
       <height>771</height>
@@ -193,8 +193,8 @@ QLineEdit#searchBar:focus {
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>120</y>
+       <x>80</x>
+       <y>140</y>
        <width>31</width>
        <height>20</height>
       </rect>
@@ -207,7 +207,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>260</y>
+       <y>310</y>
        <width>63</width>
        <height>20</height>
       </rect>
@@ -220,7 +220,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>70</x>
-       <y>330</y>
+       <y>390</y>
        <width>31</width>
        <height>20</height>
       </rect>
@@ -232,8 +232,8 @@ QLineEdit#searchBar:focus {
     <widget class="QLabel" name="label_12">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>410</y>
+       <x>50</x>
+       <y>470</y>
        <width>81</width>
        <height>20</height>
       </rect>
@@ -245,8 +245,8 @@ QLineEdit#searchBar:focus {
     <widget class="QLabel" name="label_13">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>490</y>
+       <x>50</x>
+       <y>540</y>
        <width>71</width>
        <height>20</height>
       </rect>
@@ -259,7 +259,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>570</y>
+       <y>610</y>
        <width>131</width>
        <height>21</height>
       </rect>
@@ -272,7 +272,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>260</y>
+       <y>300</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -282,7 +282,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>330</y>
+       <y>380</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -292,7 +292,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>410</y>
+       <y>460</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -302,7 +302,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>490</y>
+       <y>540</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -312,17 +312,7 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>570</y>
-       <width>131</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="lineEdit_10">
-     <property name="geometry">
-      <rect>
-       <x>140</x>
-       <y>180</y>
+       <y>610</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -331,9 +321,9 @@ QLineEdit#searchBar:focus {
     <widget class="QLabel" name="label_15">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>50</y>
-       <width>31</width>
+       <x>80</x>
+       <y>60</y>
+       <width>41</width>
        <height>20</height>
       </rect>
      </property>
@@ -345,30 +335,40 @@ QLineEdit#searchBar:focus {
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>40</y>
+       <y>70</y>
        <width>131</width>
        <height>31</height>
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="label_18">
+    <widget class="QLabel" name="label_9">
      <property name="geometry">
       <rect>
-       <x>70</x>
-       <y>190</y>
+       <x>80</x>
+       <y>230</y>
        <width>31</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>etat</string>
+      <string>Etat</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_12">
+    <widget class="QComboBox" name="comboBox_type">
      <property name="geometry">
       <rect>
        <x>140</x>
-       <y>110</y>
+       <y>140</y>
+       <width>131</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_etat">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>220</y>
        <width>131</width>
        <height>31</height>
       </rect>
@@ -378,7 +378,7 @@ QLineEdit#searchBar:focus {
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>0</x>
       <y>10</y>
       <width>261</width>
       <height>771</height>
@@ -659,7 +659,7 @@ QLineEdit#searchBar:focus {
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="stat">
+    <widget class="QPushButton" name="pushButton_stats">
      <property name="geometry">
       <rect>
        <x>800</x>
@@ -675,8 +675,8 @@ QLineEdit#searchBar:focus {
     <widget class="QPushButton" name="pushButton_pdf">
      <property name="geometry">
       <rect>
-       <x>760</x>
-       <y>40</y>
+       <x>490</x>
+       <y>400</y>
        <width>151</width>
        <height>41</height>
       </rect>
@@ -714,8 +714,8 @@ QLineEdit#searchBar:focus {
     <widget class="QComboBox" name="comboBox_tri">
      <property name="geometry">
       <rect>
-       <x>370</x>
-       <y>50</y>
+       <x>690</x>
+       <y>40</y>
        <width>221</width>
        <height>31</height>
       </rect>
@@ -739,9 +739,45 @@ QLineEdit#searchBar:focus {
     <widget class="QPushButton" name="pushButton_tri">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>550</x>
        <y>40</y>
-       <width>111</width>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>recherche</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_qr">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>400</y>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>qrcode</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="comboBox_Tri">
+     <property name="geometry">
+      <rect>
+       <x>360</x>
+       <y>40</y>
+       <width>171</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_Tri">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>40</y>
+       <width>121</width>
        <height>41</height>
       </rect>
      </property>

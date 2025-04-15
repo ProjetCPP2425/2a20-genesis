@@ -6,7 +6,6 @@
 #include <QDebug>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
-#include "statistiquesdialog.h"
 #include <QPrinter>
 #include <QPainter>
 #include <QFileDialog>
@@ -16,6 +15,15 @@
 #include "qrcode.h"
 #include "qrcodegen.hpp"
 #include <QStandardPaths>
+#include <QMap>
+#include <QPainter>
+#include <QPixmap>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QMessageBox>
+#include "camembertdialog.h"
+
+
 
 
 using qrcodegen::QrCode;
@@ -27,12 +35,17 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->comboBox_Tri->addItems({
+        "Tri par quantité (↑)",
+        "Tri par quantité (↓)",
+        "Tri par prix (↑)",
+        "Tri par prix (↓)"
+    });
 
     // Validation : Le nom et le type ne doivent contenir que des lettres et des espaces
     QRegularExpression regexNomType("^[A-Za-zÀ-ÖØ-öø-ÿ\\s]+$");
     QRegularExpressionValidator *validatorNomType = new QRegularExpressionValidator(regexNomType, this);
     ui->lineEdit_11->setValidator(validatorNomType);
-    ui->lineEdit_12->setValidator(validatorNomType);
 
     // Validation : Quantité (nombre entier positif)
     QIntValidator *validatorQuantite = new QIntValidator(0, 99999, this);
@@ -45,14 +58,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->comboBox_tri->clear();
     ui->comboBox_tri->addItems({"Tout afficher", "Disponible", "En panne", "En maintenance", "Réservé"});
+    ui->comboBox_type->addItems({"Meuble", "Informatique", "Électronique","Climatisation"});
+    ui->comboBox_etat->addItems({"Disponible", "En panne", "En maintenance", "Réservé"});
 
     connect(ui->pushButton_valider, &QPushButton::clicked, this, &MainWindow::ajouterRessource);
     connect(ui->pushButton_modif, &QPushButton::clicked, this, &MainWindow::modifierRessource);
     connect(ui->pushButton_supp, &QPushButton::clicked, this, &MainWindow::supprimerRessource);
-    connect(ui->stat, &QPushButton::clicked, this, &MainWindow::calculerStatistiques);
+    connect(ui->pushButton_stats, &QPushButton::clicked, this, &MainWindow::afficherStatistiquesCamembert);
     connect(ui->pushButton_pdf, &QPushButton::clicked, this, &MainWindow::exporterPDF);
     connect(ui->pushButton_tri, &QPushButton::clicked, this, &MainWindow::TrierParDisponibilite);
     connect(ui->calendar_maintenance, &QCalendarWidget::clicked, this, &MainWindow::afficherRessourcesPourDate);
+    connect(ui->pushButton_Tri, &QPushButton::clicked, this, [=]() {
+        QString mode = ui->comboBox_Tri->currentText();  // ou le vrai nom de ta comboBox
+
+        if (mode == "Tri par quantité (↑)") {
+            trierTableParColonne(3, Qt::AscendingOrder);  // colonne 3 = Quantité
+        } else if (mode == "Tri par quantité (↓)") {
+            trierTableParColonne(3, Qt::DescendingOrder);
+        } else if (mode == "Tri par prix (↑)") {
+            trierTableParColonne(4, Qt::AscendingOrder);  // colonne 4 = Prix
+        } else if (mode == "Tri par prix (↓)") {
+            trierTableParColonne(4, Qt::DescendingOrder);
+        }
+    });
+
 
     afficherRessources();
 }
@@ -64,29 +93,32 @@ MainWindow::~MainWindow()
 
 void MainWindow::afficherRessources()
 {
-    QSqlQuery query("SELECT NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM RESSOURCES");
+    QSqlQuery query("SELECT IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM RESSOURCES");
 
-    ui->tableWidget->setColumnCount(8);
-    ui->tableWidget->setHorizontalHeaderLabels({"Nom", "Type", "État", "Quantité", "Prix", "Localisation", "Date Achat", "Date Maintenance"});
+    ui->tableWidget->setColumnCount(9);
+    ui->tableWidget->setHorizontalHeaderLabels({"ID", "Nom", "Type", "État", "Quantité", "Prix", "Localisation", "Date Achat", "Date Maintenance"});
 
     ui->tableWidget->setRowCount(0);
     int row = 0;
 
     while (query.next()) {
         ui->tableWidget->insertRow(row);
-        for (int col = 0; col < 8; col++) {
-            ui->tableWidget->setItem(row, col, new QTableWidgetItem(query.value(col).toString()));
+        for (int col = 0; col < 9; col++) {
+            QTableWidgetItem *item = new QTableWidgetItem(query.value(col).toString());
+            if (col == 0) item->setFlags(item->flags() & ~Qt::ItemIsEditable);  // ID non modifiable
+            ui->tableWidget->setItem(row, col, item);
         }
         row++;
     }
 
-
+    ui->tableWidget->setColumnHidden(0, true);  // cacher la colonne ID
 }
+
 
 void MainWindow::ajouterRessource()
 {
-    if (ui->lineEdit_11->text().isEmpty() || ui->lineEdit_12->text().isEmpty() ||
-        ui->lineEdit_10->text().isEmpty() || ui->lineEdit_7->text().isEmpty() ||
+    if (ui->lineEdit_11->text().isEmpty() || ui->comboBox_type->currentText().isEmpty() ||
+        ui->comboBox_etat->currentText().isEmpty() || ui->lineEdit_7->text().isEmpty() ||
         ui->lineEdit_8->text().isEmpty() || ui->lineEdit_9->text().isEmpty())
     {
         QMessageBox::warning(this, "Erreur", "Tous les champs doivent être remplis.");
@@ -116,13 +148,12 @@ void MainWindow::ajouterRessource()
     QSqlQuery query;
     query.prepare(R"(
         INSERT INTO RESSOURCES (IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM)
-        VALUES (RESSOURCES_SEQ.NEXTVAL, :nom, :type, :etat, :quantite, :prix, :localisation,
+        VALUES (RESSOURCES_SEQ.NEXTVAL, :nom, :type, 'Disponible', :quantite, :prix, :localisation,
                 TO_DATE(:dateAchat, 'DD-MM-YYYY'), TO_DATE(:dateMaintenance, 'DD-MM-YYYY'))
     )");
 
     query.bindValue(":nom", ui->lineEdit_11->text());
-    query.bindValue(":type", ui->lineEdit_12->text());
-    query.bindValue(":etat", ui->lineEdit_10->text());
+    query.bindValue(":type", ui->comboBox_type->currentText());
     query.bindValue(":quantite", quantite);
     query.bindValue(":prix", prix);
     query.bindValue(":localisation", ui->lineEdit_9->text());
@@ -134,18 +165,24 @@ void MainWindow::ajouterRessource()
         qDebug() << "SQL Error: " << query.lastError().text();
         return;
     }
-    QString chemin = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
-                    + "/" + ui->lineEdit_11->text() + "_QRCode.png";
 
+    // ✅ Génération automatique du code QR
+    QString chemin = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
+                     + "/" + ui->lineEdit_11->text() + "_QRCode.png";
     genererQRCode(ui->lineEdit_11->text(), chemin);
+
+    // ✅ Mise à jour interface
     QMessageBox::information(this, "Succès", "Ressource ajoutée avec succès.");
     afficherRessources();
     on_comboBox_tri_currentTextChanged(ui->comboBox_tri->currentText());
-    afficherDatesMaintenance();  // ⬅️ ajoute cette ligne
+    afficherDatesMaintenance();
 
-    StatistiquesDialog dialog(this);
-    dialog.afficherStatistiques();
+
 }
+
+
+
+// ✅ 2. modifierRessource corrigée :
 void MainWindow::modifierRessource()
 {
     int selectedRow = ui->tableWidget->currentRow();
@@ -154,31 +191,22 @@ void MainWindow::modifierRessource()
         return;
     }
 
-    // Étape 1 : récupérer le nom
-    QString nomR = ui->tableWidget->item(selectedRow, 0)->text();
-
-    // Étape 2 : récupérer l'ID depuis la base
-    QSqlQuery idQuery;
-    idQuery.prepare("SELECT IDR FROM RESSOURCES WHERE NOMR = :nom");
-    idQuery.bindValue(":nom", nomR);
-    if (!idQuery.exec() || !idQuery.next()) {
-        QMessageBox::warning(this, "Erreur", "Impossible de récupérer l'identifiant de la ressource.");
-        return;
-    }
-    int idR = idQuery.value(0).toInt();
+    // Récupérer l'ID directement depuis la colonne cachée
+    int idR = ui->tableWidget->item(selectedRow, 0)->text().toInt();
 
     // Récupérer les anciennes valeurs
-    QString oldType = ui->tableWidget->item(selectedRow, 1)->text();
-    QString oldEtat = ui->tableWidget->item(selectedRow, 2)->text();
-    int oldQuantite = ui->tableWidget->item(selectedRow, 3)->text().toInt();
-    float oldPrix = ui->tableWidget->item(selectedRow, 4)->text().toFloat();
-    QString oldLocalisation = ui->tableWidget->item(selectedRow, 5)->text();
-    QDate oldDateAchat = QDate::fromString(ui->tableWidget->item(selectedRow, 6)->text(), "dd-MM-yyyy");
-    QDate oldDateMaintenance = QDate::fromString(ui->tableWidget->item(selectedRow, 7)->text(), "dd-MM-yyyy");
+    QString oldType = ui->tableWidget->item(selectedRow, 2)->text();
+    QString oldEtat = ui->tableWidget->item(selectedRow, 3)->text();
+    int oldQuantite = ui->tableWidget->item(selectedRow, 4)->text().toInt();
+    float oldPrix = ui->tableWidget->item(selectedRow, 5)->text().toFloat();
+    QString oldLocalisation = ui->tableWidget->item(selectedRow, 6)->text();
+    QDate oldDateAchat = QDate::fromString(ui->tableWidget->item(selectedRow, 7)->text(), "dd-MM-yyyy");
+    QDate oldDateMaintenance = QDate::fromString(ui->tableWidget->item(selectedRow, 8)->text(), "dd-MM-yyyy");
 
     // Nouvelles valeurs (ou anciennes si vide)
-    QString type = ui->lineEdit_12->text().trimmed().isEmpty() ? oldType : ui->lineEdit_12->text().trimmed();
-    QString etat = ui->lineEdit_10->text().trimmed().isEmpty() ? oldEtat : ui->lineEdit_10->text().trimmed();
+    QString nom = ui->lineEdit_11->text().trimmed();
+    QString type = ui->comboBox_type->currentText();
+    QString etat = ui->comboBox_etat->currentText();
     int quantite = ui->lineEdit_7->text().trimmed().isEmpty() ? oldQuantite : ui->lineEdit_7->text().trimmed().toInt();
     float prix = ui->lineEdit_8->text().trimmed().isEmpty() ? oldPrix : ui->lineEdit_8->text().trimmed().toFloat();
     QString localisation = ui->lineEdit_9->text().trimmed().isEmpty() ? oldLocalisation : ui->lineEdit_9->text().trimmed();
@@ -205,7 +233,7 @@ void MainWindow::modifierRessource()
         WHERE IDR=:id
     )");
 
-    query.bindValue(":nom", nomR);
+    query.bindValue(":nom", nom);
     query.bindValue(":type", type);
     query.bindValue(":etat", etat);
     query.bindValue(":quantite", quantite);
@@ -222,20 +250,19 @@ void MainWindow::modifierRessource()
 
     QMessageBox::information(this, "Succès", "Ressource modifiée avec succès !");
     afficherRessources();
-    afficherDatesMaintenance();  // ⬅️ ajoute cette ligne
+    afficherDatesMaintenance();
+    on_comboBox_tri_currentTextChanged(ui->comboBox_tri->currentText());
 
-    on_comboBox_tri_currentTextChanged(ui->comboBox_tri->currentText()); // Filtre mis à jour si actif
-
-    // Nettoyage
     ui->lineEdit_11->clear();
-    ui->lineEdit_12->clear();
-    ui->lineEdit_10->clear();
+    ui->comboBox_type->setCurrentIndex(-1);
+    ui->comboBox_etat->setCurrentIndex(-1);
     ui->lineEdit_7->clear();
     ui->lineEdit_8->clear();
     ui->lineEdit_9->clear();
     ui->dateEdit_3->clear();
     ui->dateEdit_4->clear();
 }
+
 
 
 void MainWindow::supprimerRessource()
@@ -266,39 +293,76 @@ void MainWindow::supprimerRessource()
         }
     }
 }
-void MainWindow::calculerStatistiques()
-{
-    QSqlQuery query;
-    query.prepare("SELECT SUM(QUANTITER), AVG(PRIXR) FROM RESSOURCES");
-
-    if (query.exec()) {
-        if (query.next()) {
-            int totalQuantite = query.value(0).toInt();
-            float prixMoyen = query.value(1).toFloat();
-
-            // Créer l'instance de la fenêtre pop-up
-            StatistiquesDialog *dialog = new StatistiquesDialog(this);
-
-            // Passer les statistiques sous forme de texte
-            QString stats = "Quantité totale des ressources : " + QString::number(totalQuantite) + "\n" +
-                            "Prix moyen des ressources : " + QString::number(prixMoyen);
-
-            // Passer les statistiques à la fenêtre
-            dialog->afficherStatistiques();  // Fonction correcte !
-
-
-            // Ouvrir la fenêtre de statistiques
-            dialog->exec();
-        }
-    } else {
-        QMessageBox::warning(this, "Erreur", "Erreur lors de la récupération des statistiques : " + query.lastError().text());
+class CamembertWidget : public QWidget {
+    QMap<QString, int> ressources;
+public:
+    CamembertWidget(QMap<QString, int> data, QWidget *parent = nullptr) : QWidget(parent), ressources(data) {
+        setMinimumSize(400, 400);
     }
-}
-void MainWindow::ouvrirStatistiques()
+
+protected:
+    void paintEvent(QPaintEvent *) override {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        QRectF rect(50, 50, 300, 300);
+
+        int total = 0;
+        for (auto val : ressources.values()) total += val;
+
+        QVector<QColor> couleurs = {
+            QColor("#2f466c"), QColor("#6ea8cc"), QColor("#a3bcb6"),
+            QColor("#88c0d0"), QColor("#b5c9ca")
+        };
+
+        float startAngle = 0.0;
+        int i = 0;
+        for (auto it = ressources.begin(); it != ressources.end(); ++it, ++i) {
+            float spanAngle = 360.0 * it.value() / total;
+            painter.setBrush(couleurs[i % couleurs.size()]);
+            painter.setPen(Qt::NoPen);
+            painter.drawPie(rect, int(startAngle * 16), int(spanAngle * 16));
+            startAngle += spanAngle;
+        }
+
+        // Légende
+        int y = 370;
+        i = 0;
+        for (auto it = ressources.begin(); it != ressources.end(); ++it, ++i) {
+            painter.setBrush(couleurs[i % couleurs.size()]);
+            painter.drawRect(50, y, 15, 15);
+            painter.setPen(Qt::black);
+            painter.drawText(70, y + 12, it.key() + " (" + QString::number(it.value()) + ")");
+            y += 20;
+        }
+    }
+};
+
+void MainWindow::afficherStatistiquesCamembert()
 {
-    StatistiquesDialog dialog(this);  // Créer l'objet StatistiquesDialog
-    dialog.exec();  // Ouvrir la boîte de dialogue
+    QMap<QString, int> ressources;
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
+        QString nom = ui->tableWidget->item(row, 0)->text();
+        int quantite = ui->tableWidget->item(row, 3)->text().toInt();
+        ressources[nom] += quantite;
+    }
+
+    if (ressources.isEmpty()) {
+        QMessageBox::information(this, "Statistiques", "Aucune ressource à afficher.");
+        return;
+    }
+
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Ressources les plus utilisées");
+    dialog->resize(420, 450);
+    dialog->setStyleSheet("background-color: #f5ede0; border: 2px solid #2f466c;");
+
+    CamembertWidget *camembert = new CamembertWidget(ressources);
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(camembert);
+    dialog->setLayout(layout);
+    dialog->exec();
 }
+
 
 
 void MainWindow::exporterPDF()
@@ -520,4 +584,59 @@ void MainWindow::afficherRessourcesPourDate(const QDate &date)
         info = "Aucune ressource à maintenir à cette date.";
 
     QMessageBox::information(this, "Maintenance du " + date.toString("dddd d MMMM yyyy"), info);
+}
+void MainWindow::on_pushButton_qr_clicked()
+{
+    int selectedRow = ui->tableWidget->currentRow();
+    if (selectedRow == -1) {
+        QMessageBox::warning(this, "Avertissement", "Veuillez sélectionner une ressource dans le tableau.");
+        return;
+    }
+
+    QString nomRessource = ui->tableWidget->item(selectedRow, 0)->text();  // Colonne 0 = Nom
+
+    // Demander l'emplacement du fichier
+    QString chemin = QFileDialog::getSaveFileName(this, "Enregistrer le QR Code", nomRessource + ".png", "Images PNG (*.png)");
+    if (chemin.isEmpty())
+        return;
+
+    // Générer le QR code
+    if (QrCodeGenerator::genererQRCode(nomRessource, chemin)) {
+        QMessageBox::information(this, "Succès", "QR Code généré et enregistré avec succès !");
+    } else {
+        QMessageBox::critical(this, "Erreur", "Échec de la génération du QR Code.");
+    }
+}
+void MainWindow::appliquerTri()
+{
+        QString mode = ui->comboBox_Tri->currentText();
+
+        // Trouver l’index de la colonne à trier
+        int colonneTri = -1;
+        Qt::SortOrder ordre = Qt::AscendingOrder;
+
+        if (mode == "Tri par quantité (↑)") {
+            colonneTri = 3;  // Colonne "Quantité"
+            ordre = Qt::AscendingOrder;
+        } else if (mode == "Tri par quantité (↓)") {
+            colonneTri = 3;
+            ordre = Qt::DescendingOrder;
+        } else if (mode == "Tri par prix (↑)") {
+            colonneTri = 4;  // Colonne "Prix"
+            ordre = Qt::AscendingOrder;
+        } else if (mode == "Tri par prix (↓)") {
+            colonneTri = 4;
+            ordre = Qt::DescendingOrder;
+        }
+
+        if (colonneTri != -1) {
+            ui->tableWidget->sortItems(colonneTri, ordre);
+        }
+}
+
+
+
+void MainWindow::trierTableParColonne(int colonne, Qt::SortOrder ordre)
+{
+        ui->tableWidget->sortItems(colonne, ordre);
 }
