@@ -367,7 +367,7 @@ void MainWindow::on_statistique_clicked()
 void MainWindow::on_lire_clicked()
 {
     int row = ui->tableWidget->currentRow();
-    if (row == 1) {
+    if (row == -1) {
         QMessageBox::information(this, "Information", "Veuillez sélectionner une boutique à lire.");
         return;
     }
