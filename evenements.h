@@ -24,8 +24,13 @@ class evenement
     float budget;
 
 public:
+<<<<<<< HEAD
     evenement();  // Default constructor
     evenement(QString, QDate, QDate, QString, int, QString, float);  // Correct constructor
+=======
+    evenement();
+    evenement(QString, QDate, QDate, QString, int, QString, float);
+>>>>>>> 8a1c2a3 (final)
     bool modifier(QString old_nom);
     QSqlQueryModel* searchByName(const QString &name);
     QSqlQueryModel* getPastEvents();
@@ -35,8 +40,12 @@ public:
     bool ajouter();
     bool supprimer(QString nom);
     void afficherStatistiques(QWidget *parent);
+<<<<<<< HEAD
     // In evenements.h
     //void notifierProchainEvenement(QWidget *parent, QSystemTrayIcon *trayIcon);
+=======
+
+>>>>>>> 8a1c2a3 (final)
     void notifierProchainEvenement(QWidget *parent);
     // Getters and Setters
     int Getid() { return id_ev; }

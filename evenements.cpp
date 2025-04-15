@@ -131,6 +131,7 @@ bool evenement::supprimer(QString nom) {
 }
 
 void evenement::afficherStatistiques(QWidget *parent) {
+<<<<<<< HEAD
     // Create a new dialog window
     QDialog *statsDialog = new QDialog(parent);
     statsDialog->setWindowTitle("Statistiques des Événements");
@@ -140,6 +141,14 @@ void evenement::afficherStatistiques(QWidget *parent) {
     QHBoxLayout *layout = new QHBoxLayout(statsDialog);
 
     // First chart: Distribution by Location
+=======
+    QDialog *statsDialog = new QDialog(parent);
+    statsDialog->setWindowTitle("Statistiques des Événements");
+    statsDialog->setMinimumSize(1250, 450);
+
+    QHBoxLayout *layout = new QHBoxLayout(statsDialog);//les éléments sont mis côte à côte
+
+>>>>>>> 8a1c2a3 (final)
     QSqlQuery locationQuery;
     locationQuery.prepare("SELECT LIEU, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY LIEU");
 
@@ -158,7 +167,10 @@ void evenement::afficherStatistiques(QWidget *parent) {
         locationSeries->append(location, count);
     }
 
+<<<<<<< HEAD
     // Second chart: Distribution by Sponsors
+=======
+>>>>>>> 8a1c2a3 (final)
     QSqlQuery sponsorQuery;
     sponsorQuery.prepare("SELECT SPONSORS, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY SPONSORS");
 
@@ -177,7 +189,10 @@ void evenement::afficherStatistiques(QWidget *parent) {
         sponsorSeries->append(sponsor, count);
     }
 
+<<<<<<< HEAD
     // Customize both series
+=======
+>>>>>>> 8a1c2a3 (final)
     for (QPieSlice *slice : locationSeries->slices()) {
         slice->setLabel(slice->label() + " (" + QString::number(slice->percentage() * 100, 'f', 1) + "%)");
     }
@@ -222,12 +237,17 @@ QSqlQueryModel* evenement::searchByName(const QString &name)
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
     query.prepare("SELECT * FROM evenements WHERE nom LIKE :name");
+<<<<<<< HEAD
     query.bindValue(":name", "%" + name + "%");  // Use LIKE for partial matches
+=======
+    query.bindValue(":name", "%" + name + "%");
+>>>>>>> 8a1c2a3 (final)
     query.exec();
     model->setQuery(query);
     return model;
 }
 
+<<<<<<< HEAD
 /*
 QSqlQueryModel* evenement::getPastEvents() {
     QSqlQueryModel *model = new QSqlQueryModel();
@@ -247,6 +267,8 @@ QSqlQueryModel* evenement::getPastEvents() {
 }
 */
 
+=======
+>>>>>>> 8a1c2a3 (final)
 
 QSqlQueryModel* evenement::trier(const QString& critere, const QString& ordre) {
     QSqlQueryModel* model = new QSqlQueryModel();

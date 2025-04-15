@@ -212,6 +212,7 @@ void MainWindow::on_pushButton_modifier_clicked()
     if (test) {
         QMessageBox::information(this, "Succès", "Événement modifié avec succès.");
         ui->tableView4->setModel(e.afficher());
+<<<<<<< HEAD
     } else {
         QMessageBox::critical(this, "Erreur", "Échec de la modification de l'événement.");
     }
@@ -560,6 +561,337 @@ void MainWindow::checkUpcomingEvents()
     }
 }
 
+=======
+    } else {
+        QMessageBox::critical(this, "Erreur", "Échec de la modification de l'événement.");
+    }
+    connect(ui->tableView4->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &MainWindow::onRowSelected);
+
+}
+
+
+void MainWindow::on_pushButton_stats_clicked()  // Add this slot in header too
+{
+    evenement e;
+    e.afficherStatistiques(this);
+}
+
+void MainWindow::on_pushButton_export_pdf_clicked()
+{
+    QModelIndexList selectedIndexes = ui->tableView4->selectionModel()->selectedRows();
+    if (selectedIndexes.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez sélectionner un événement à exporter.");
+        return;
+    }
+
+    QModelIndex index = selectedIndexes.first();
+    QString eventName = ui->tableView4->model()->data(index.sibling(index.row(), 1)).toString();
+    QDateTime startDateTime = ui->tableView4->model()->data(index.sibling(index.row(), 2)).toDateTime();  // Include time
+    QDateTime endDateTime = ui->tableView4->model()->data(index.sibling(index.row(), 3)).toDateTime();    // Include time
+    QString venue = ui->tableView4->model()->data(index.sibling(index.row(), 4)).toString();
+    int capacity = ui->tableView4->model()->data(index.sibling(index.row(), 5)).toInt();
+    QString sponsors = ui->tableView4->model()->data(index.sibling(index.row(), 6)).toString();
+    float budget = ui->tableView4->model()->data(index.sibling(index.row(), 7)).toFloat();
+
+    // Open file dialog for PDF save location
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Exporter l'événement en PDF",
+                                                    QDir::homePath() + "/" + eventName + "_event.pdf",
+                                                    "PDF Files (*.pdf)");
+    if (fileName.isEmpty())
+        return;
+
+    // Set up PDF printer
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(fileName);
+    printer.setPageSize(QPageSize(QPageSize::A4));
+    printer.setFullPage(false);
+
+    QPageLayout layout(QPageSize(QPageSize::A4), QPageLayout::Landscape, QMarginsF(60, 60, 60, 60));
+    printer.setPageLayout(layout);
+
+    QPainter painter;
+    if (!painter.begin(&printer)) {
+        QMessageBox::warning(this, "Erreur", "Échec de l'ouverture du fichier PDF pour l'écriture");
+        return;
+    }
+
+    QFont nameFont("Montserrat", 48, QFont::Bold);  // Larger and bolder for emphasis
+    QFont textFont("Montserrat", 18);              // Slightly larger for readability
+    QFont footerFont("Montserrat", 14);
+    footerFont.setItalic(true);                    // Set italic style after construction
+
+    // Get page dimensions
+    QRect pageRect = printer.pageRect(QPrinter::DevicePixel).toRect();
+    int pageWidth = pageRect.width();
+    int pageHeight = pageRect.height();
+    int margin = 150;  // Increased margin for a more spacious look (from previous design)
+    int contentWidth = pageWidth - 2 * margin;
+    int yPos = margin;
+
+    // Increase header dimensions by 1000 (matching original placement)
+    int baseHeaderWidth = contentWidth;
+    int baseHeaderHeight = 150;
+    int headerWidth = baseHeaderWidth + 1000;
+    int headerHeight = baseHeaderHeight + 1000;
+
+    // Cap header width to page boundaries
+    if (headerWidth > pageWidth - margin) {
+        headerWidth = pageWidth - margin - 20;
+    }
+
+    QRadialGradient radialGradient(pageWidth / 2, yPos, 400, pageWidth / 2, yPos);
+    radialGradient.setColorAt(0, QColor(230, 240, 250));  // Light teal center
+    radialGradient.setColorAt(1, QColor(163, 191, 250));  // Soft cyan edge
+    painter.setBrush(QBrush(radialGradient));
+    painter.setPen(Qt::NoPen);
+    painter.drawRoundedRect(margin, yPos - 75, headerWidth, headerHeight, 40, 40);
+
+    painter.setFont(nameFont);
+    painter.setPen(QColor(0, 109, 119));
+    QRect nameRect(margin, yPos - 25, headerWidth, headerHeight - 50);
+    painter.drawText(nameRect, Qt::AlignCenter, eventName);
+    painter.setPen(Qt::gray);
+    painter.drawText(nameRect.translated(3, 3), Qt::AlignCenter, eventName);  // Enhanced shadow
+    yPos += headerHeight;
+
+    // Draw modern underline with gradient
+    QLinearGradient underlineGradient(margin + 100, yPos, margin + headerWidth - 100, yPos);
+    underlineGradient.setColorAt(0, QColor(0, 109, 119));
+    underlineGradient.setColorAt(1, QColor(163, 191, 250));
+    painter.setPen(QPen(QBrush(underlineGradient), 6));
+    painter.drawLine(margin + 100, yPos, margin + headerWidth - 100, yPos);
+    yPos += 50;  // Matching original placement
+
+    QStringList details;
+    details << "Date et heure de début: " + startDateTime.toString("dd/MM/yyyy HH:mm")
+            << "Date et heure de fin: " + endDateTime.toString("dd/MM/yyyy HH:mm")
+            << "Lieu: " + venue
+            << "Capacité: " + QString::number(capacity)
+            << "Sponsors: " + sponsors
+            << "Budget: " + QString::number(budget, 'f', 2) + " TND";
+
+    painter.setFont(textFont);
+    QFontMetrics fm(textFont);
+    int lineHeight = fm.height() * 1.5;
+
+    // Detail box dimensions (increased by 1000, matching original placement)
+    int baseBoxWidth = contentWidth - 40;
+    int baseBoxHeight = lineHeight * 3 + 40;
+    int boxWidth = baseBoxWidth + 1000;
+    int boxHeight = baseBoxHeight + 1000;
+
+    if (boxWidth > pageWidth - margin) {
+        boxWidth = pageWidth - margin - 20;
+    }
+
+    painter.setPen(QColor(74, 74, 74));  // Warm gray
+    for (const QString& detail : details) {
+        QRect detailRect(margin, yPos, boxWidth, boxHeight);
+        painter.setBrush(QBrush(QColor(245, 248, 250, 80)));  // Light background with more opacity
+        painter.setPen(Qt::NoPen);
+        painter.drawRoundedRect(detailRect, 20, 20);
+        painter.setPen(QColor(74, 74, 74));
+        painter.drawText(detailRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, detail);
+
+        if (yPos + boxHeight > pageHeight - 150) {
+            printer.newPage();
+            yPos = margin;
+            // Redraw larger header on new page
+            painter.setBrush(QBrush(radialGradient));
+            painter.setPen(Qt::NoPen);
+            painter.drawRoundedRect(margin, yPos - 75, headerWidth, headerHeight, 40, 40);
+            painter.setFont(nameFont);
+            painter.setPen(QColor(0, 109, 119));
+            painter.drawText(nameRect, Qt::AlignCenter, eventName);
+            painter.setPen(Qt::gray);
+            painter.drawText(nameRect.translated(3, 3), Qt::AlignCenter, eventName);  // Shadow
+            yPos += headerHeight;
+            painter.setPen(QPen(QBrush(underlineGradient), 6));
+            painter.drawLine(margin + 100, yPos, margin + headerWidth - 100, yPos);
+            yPos += 50;
+            painter.setFont(textFont);
+            painter.setPen(QColor(74, 74, 74));
+        }
+
+        yPos += boxHeight + 30;  // Matching original placement
+    }
+    painter.setBrush(QBrush(QColor(230, 240, 250, 120)));
+    painter.setPen(Qt::NoPen);
+    painter.drawRect(margin, pageHeight - 150, contentWidth, 100);
+    painter.setFont(footerFont);
+    painter.setPen(Qt::gray);
+    QString footer = "Généré le " + QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm");
+    painter.drawText(margin + 20, pageHeight - 120, contentWidth - 40, 50, Qt::AlignLeft, footer);
+
+    // Draw enhanced watermark
+    QFont watermarkFont("Montserrat", 60, QFont::Light);
+    painter.setFont(watermarkFont);
+    QLinearGradient watermarkGradient(0, 0, pageWidth, pageHeight);
+    watermarkGradient.setColorAt(0, QColor(0, 109, 119, 15));
+    watermarkGradient.setColorAt(1, QColor(163, 191, 250, 5));
+    painter.setPen(QPen(watermarkGradient, 2));
+    painter.save();
+    painter.translate(pageWidth / 2, pageHeight / 2);
+    painter.rotate(-45);
+    painter.drawText(-pageWidth / 2, -70, pageWidth, 140, Qt::AlignCenter, "Événement");
+    painter.restore();
+
+    painter.end();
+    QMessageBox::information(this, "Succès", "L'événement a été exporté en PDF avec succès");
+}
+
+void MainWindow::on_lineEdit_search_textChanged(const QString &text)
+{
+    evenement e;
+    if (text.trimmed().isEmpty()) {
+        ui->tableView4->setModel(e.afficher());
+    } else {
+        ui->tableView4->setModel(e.searchByName(text.trimmed()));
+    }
+    connect(ui->tableView4->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &MainWindow::onRowSelected);
+}
+
+void MainWindow::on_pushButton_historique_clicked()
+{
+    QSqlQuery query;
+    query.prepare(
+        "SELECT "
+        "VERSIONS_STARTTIME, "
+        "VERSIONS_OPERATION, "
+        "ID_EV, NOM, DATE_DEBUT, DATE_FIN, LIEU, CAPACITE, SPONSORS, BUDGET "
+        "FROM EVENEMENTS "
+        "VERSIONS BETWEEN SCN MINVALUE AND MAXVALUE "
+        "WHERE versions_operation IN ('U', 'D', 'I') "
+        "ORDER BY ID_EV, VERSIONS_STARTTIME"
+        );
+
+    QStringList historyList;
+    QMap<int, QVariantMap> previousState;
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString op = query.value("VERSIONS_OPERATION").toString();
+            QString time = query.value("VERSIONS_STARTTIME").toDateTime().toString("yyyy-MM-dd HH:mm:ss");
+            int id = query.value("ID_EV").toInt();
+
+            QVariantMap current;
+            current["NOM"] = query.value("NOM");
+            current["DATE_DEBUT"] = query.value("DATE_DEBUT");
+            current["DATE_FIN"] = query.value("DATE_FIN");
+            current["LIEU"] = query.value("LIEU");
+            current["CAPACITE"] = query.value("CAPACITE");
+            current["SPONSORS"] = query.value("SPONSORS");
+            current["BUDGET"] = query.value("BUDGET");
+
+            if (op == "I") {
+                historyList << QString("ID: %1 | Ajouté le %2").arg(id).arg(time);
+            } else if (op == "D") {
+                historyList << QString("ID: %1 | Supprimé le %2").arg(id).arg(time);
+            } else if (op == "U") {
+                QStringList changes;
+                QVariantMap prev = previousState.value(id);
+
+                for (auto key : current.keys()) {
+                    if (prev.contains(key) && prev[key] != current[key]) {
+                        changes << QString("%1: '%2' → '%3'")
+                                       .arg(key)
+                                       .arg(prev[key].toString())
+                                       .arg(current[key].toString());
+                    }
+                }
+
+                if (!changes.isEmpty()) {
+                    historyList << QString("ID: %1 | Modifié le %2 | %3")
+                                       .arg(id)
+                                       .arg(time)
+                                       .arg(changes.join(" | "));
+                }
+            }
+
+            // Mémoriser l'état actuel pour la prochaine comparaison
+            previousState[id] = current;
+        }
+
+        // Afficher l’historique dans le popup
+        HistoryDialog *dialog = new HistoryDialog(this);
+        dialog->setHistory(historyList);
+        dialog->exec();
+    } else {
+        qDebug() << "Erreur dans la requête:" << query.lastError().text();
+    }
+    connect(ui->tableView4->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &MainWindow::onRowSelected);
+}
+
+//tri
+
+void MainWindow::onComboBox2IndexChanged(int index)
+{
+    evenement e;
+    QSqlQueryModel* sortedModel = nullptr;
+
+    if (index == 0) {
+        sortedModel = e.trier(QString("lieu"), QString("ASC"));
+    }
+    else if (index == 1) {
+        sortedModel = e.trier(QString("sponsors"), QString("ASC"));
+    }
+    else if (index == 2) {
+        sortedModel = e.trier(QString("capacite"), QString("DESC"));
+    }
+
+    if (sortedModel) {
+        ui->tableView4->setModel(sortedModel);
+    }
+
+    connect(ui->tableView4->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &MainWindow::onRowSelected);
+}
+
+void MainWindow::checkUpcomingEvents()
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM IMENE.EVENEMENTS WHERE DATE_DEBUT >= :currentDate AND DATE_DEBUT <= :twoDaysLater");
+
+    QDate currentDate = QDate::currentDate();
+    QDate twoDaysLater = currentDate.addDays(2);
+
+    qDebug() << "Current Date: " << currentDate.toString("yyyy-MM-dd");
+    qDebug() << "Two Days Later: " << twoDaysLater.toString("yyyy-MM-dd");
+
+    query.bindValue(":currentDate", QVariant(currentDate));
+    query.bindValue(":twoDaysLater", QVariant(twoDaysLater));
+
+    if (query.exec()) {
+        bool eventFound = false;
+        QString allMessages;
+
+        while (query.next()) {
+            QString eventName = query.value("NOM").toString();
+            QString eventDate = query.value("DATE_DEBUT").toString();
+            QString message = "• L'événement '" + eventName + "' arrive le " + eventDate + " !\n";
+            allMessages += message;
+            eventFound = true;
+        }
+
+        if (!eventFound) {
+            allMessages = "Aucun événement à venir dans les 2 prochains jours.";
+        }
+
+        showNotification(allMessages);
+
+    } else {
+        // Show detailed error message from the database query
+        QString error = query.lastError().text();
+        QMessageBox::critical(this, "Erreur de la requête", "Erreur lors de l'exécution de la requête: " + error);
+    }
+}
+
+>>>>>>> 8a1c2a3 (final)
 
 
 void MainWindow::showNotification(const QString &message)
