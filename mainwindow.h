@@ -6,8 +6,11 @@
 #include <QPrinter>
 #include <QPainter>
 #include <QFileDialog>
+<<<<<<< HEAD
 #include "arduino.h"
 
+=======
+>>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -47,18 +50,24 @@ private slots:
     void checkUpcomingEvents();
     void showNotification(const QString &message);
 
+<<<<<<< HEAD
 
     void on_pushButton_testarduino_clicked();
 
     void on_pushButton_arduinoff_clicked();
     void update_label();
+=======
+>>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
 
 private:
     Ui::MainWindow *ui;
     evenement e;
      QSystemTrayIcon *trayIcon;
+<<<<<<< HEAD
     QByteArray data; // variable contenant les données reçues
 
     Arduino A; // objet temporaire
+=======
+>>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
 };
 #endif // MAINWINDOW_H

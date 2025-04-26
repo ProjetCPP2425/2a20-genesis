@@ -1156,6 +1156,7 @@ QLineEdit:focus {
       </rect>
      </property>
     </widget>
+<<<<<<< HEAD
     <widget class="QPushButton" name="pushButton_testarduino">
      <property name="geometry">
       <rect>
@@ -1195,6 +1196,8 @@ QLineEdit:focus {
       <string>I</string>
      </property>
     </widget>
+=======
+>>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">

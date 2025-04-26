@@ -39,7 +39,15 @@ HistoryDialog::HistoryDialog(QWidget *parent) : QDialog(parent)
         }
     )");
 
+<<<<<<< HEAD
     layout = new QVBoxLayout(this);
+=======
+<<<<<<< HEAD
+    layout = new QVBoxLayout(this);
+=======
+    layout = new QVBoxLayout(this);//layout vertival
+>>>>>>> 8a1c2a3 (final)
+>>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
     titleLabel = new QLabel("Event History Details:", this);
 
     historyListWidget = new QListWidget(this);
