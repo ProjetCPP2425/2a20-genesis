@@ -204,41 +204,7 @@ QLineEdit, QTextEdit, QPlainTextEdit {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700; color:#00007f;&quot;&gt;Lieu&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineedit_lieu">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>320</y>
-       <width>231</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="whatsThis">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLineEdit {
-    background: #ffffff; /* White background */
-    border: 2px solid #213555; /* Blue border */
-    border-radius: 12px; /* Rounded corners */
-    padding: 8px;
-    font-size: 13px;
-    color: #3e5879; /* Dark text color */
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-QLineEdit:focus {
-    border: 2px solid #00bfff; /* Blue border on focus */
-    background: #f5f5f5; /* Light gray background on focus */
-}
-</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-    <widget class="QDateEdit" name="lineedit_date_fin">
+    <widget class="QDateEdit" name="lineedit_date_debut">
      <property name="geometry">
       <rect>
        <x>60</x>
@@ -382,40 +348,6 @@ QLineEdit, QTextEdit, QPlainTextEdit {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700; color:#00007f;&quot;&gt;Sponsors&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineedit_sponsors">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>470</y>
-       <width>231</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="whatsThis">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QLineEdit {
-    background: #ffffff; /* White background */
-    border: 2px solid #213555; /* Blue border */
-    border-radius: 12px; /* Rounded corners */
-    padding: 8px;
-    font-size: 13px;
-    color: #3e5879; /* Dark text color */
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-QLineEdit:focus {
-    border: 2px solid #00bfff; /* Blue border on focus */
-    background: #f5f5f5; /* Light gray background on focus */
-}
-</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_17">
      <property name="geometry">
       <rect>
@@ -446,7 +378,7 @@ QLineEdit, QTextEdit, QPlainTextEdit {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700; color:#00007f;&quot;&gt;Date fin&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QDateEdit" name="lineedit_date_debut">
+    <widget class="QDateEdit" name="lineedit_date_fin">
      <property name="geometry">
       <rect>
        <x>60</x>
@@ -602,6 +534,185 @@ QPushButton:pressed {
       <string>Modifier</string>
      </property>
     </widget>
+    <widget class="QComboBox" name="comboBox_lieu">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>320</y>
+       <width>231</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QComboBox {
+    background-color: #ffffff; /* White background */
+    border: 2px solid #213555; /* Blue border */
+    border-radius: 12px; /* Rounded corners */
+    padding: 6px 10px;
+    font-size: 14px;
+    color: #213555; /* Darker text color for better visibility */
+    font-weight: bold;
+    letter-spacing: 1px;
+    min-width: 120px; /* Ensures better visibility */
+}
+
+/* When the combo box is focused */
+QComboBox:focus {
+    border: 2px solid #00bfff; /* Bright blue border */
+    background-color: #f0f8ff; /* Light blue background for visibility */
+}
+
+/* Drop-down button */
+QComboBox::drop-down {
+    border: none;
+    background: transparent;
+    width: 24px;
+    padding-right: 6px;
+}
+
+/* Custom dropdown arrow */
+QComboBox::down-arrow {
+    image: url(arrow.png); /* Ensure this path is correct */
+    width: 14px;
+    height: 14px;
+}
+
+/* Drop-down list */
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 2px solid #213555;
+    selection-background-color: #00bfff; /* Bright blue selection */
+    selection-color: #ffffff; /* White text for contrast */
+    border-radius: 8px;
+    padding: 5px;
+    font-size: 13px;
+}
+
+/* Hover effect for list items */
+QComboBox QAbstractItemView::item:hover {
+    background-color: #0077cc; /* Slightly darker blue for hover */
+    color: #ffffff;
+}
+</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>bloc A</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>bloc B</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>bloc C</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>bloc D</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>bloc E</string>
+      </property>
+     </item>
+    </widget>
+    <widget class="QComboBox" name="comboBox_sponsors">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>460</y>
+       <width>231</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QComboBox {
+    background-color: #ffffff; /* White background */
+    border: 2px solid #213555; /* Blue border */
+    border-radius: 12px; /* Rounded corners */
+    padding: 6px 10px;
+    font-size: 14px;
+    color: #213555; /* Darker text color for better visibility */
+    font-weight: bold;
+    letter-spacing: 1px;
+    min-width: 120px; /* Ensures better visibility */
+}
+
+/* When the combo box is focused */
+QComboBox:focus {
+    border: 2px solid #00bfff; /* Bright blue border */
+    background-color: #f0f8ff; /* Light blue background for visibility */
+}
+
+/* Drop-down button */
+QComboBox::drop-down {
+    border: none;
+    background: transparent;
+    width: 24px;
+    padding-right: 6px;
+}
+
+/* Custom dropdown arrow */
+QComboBox::down-arrow {
+    image: url(down-arrow.png); /* Ensure this path is correct */
+    width: 14px;
+    height: 14px;
+}
+
+/* Drop-down list */
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 2px solid #213555;
+    selection-background-color: #00bfff; /* Bright blue selection */
+    selection-color: #ffffff; /* White text for contrast */
+    border-radius: 8px;
+    padding: 5px;
+    font-size: 13px;
+}
+
+/* Hover effect for list items */
+QComboBox QAbstractItemView::item:hover {
+    background-color: #0077cc; /* Slightly darker blue for hover */
+    color: #ffffff;
+}
+</string>
+     </property>
+     <item>
+      <property name="text">
+       <string>telecom</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>orange</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>safia</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>saida</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>delice</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>esprit</string>
+      </property>
+     </item>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
@@ -685,7 +796,7 @@ QPushButton:pressed {
       <string>Supprimer</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="lineEdit_2">
+    <widget class="QLineEdit" name="lineEdit_search">
      <property name="geometry">
       <rect>
        <x>440</x>
@@ -717,7 +828,7 @@ QLineEdit:focus {
 </string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_22">
+    <widget class="QPushButton" name="pushButton_stats">
      <property name="geometry">
       <rect>
        <x>500</x>
@@ -751,7 +862,7 @@ QPushButton:pressed {
       <string>Statistique</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_23">
+    <widget class="QPushButton" name="pushButton_export_pdf">
      <property name="geometry">
       <rect>
        <x>680</x>
@@ -785,7 +896,7 @@ QPushButton:pressed {
       <string>Exporter PDF</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_24">
+    <widget class="QPushButton" name="pushButton_search">
      <property name="geometry">
       <rect>
        <x>670</x>
@@ -819,7 +930,7 @@ QPushButton:pressed {
       <string>Recherche</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_25">
+    <widget class="QPushButton" name="tri">
      <property name="geometry">
       <rect>
        <x>300</x>
@@ -853,7 +964,7 @@ QPushButton:pressed {
       <string>Tri</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_26">
+    <widget class="QPushButton" name="pushButton_historique">
      <property name="geometry">
       <rect>
        <x>390</x>
@@ -975,50 +1086,7 @@ QComboBox QAbstractItemView::item {
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">/* Style pour le QTableView */
-QTableView {
-    background-color: #ffffff; /* Fond blanc */
-    border: 1px solid #d6d9dc; /* Bordure grise claire */
-    gridline-color: #dee2e6; /* Couleur de la grille */
-    selection-background-color: #213555; /* Fond bleu pour la sélection */
-    selection-color: white; /* Texte blanc pour la sélection */
-    alternate-background-color: #eef2f5; /* Fond alterné clair */
-    border-radius: 8px; /* Coins arrondis */
-    font-size: 12px; /* Taille de police plus petite */
-    width: 100%; /* Prend toute la largeur du conteneur */
-    table-layout: fixed; /* Colonnes de largeur fixe */
-}
-
-/* Style pour les éléments de la table */
-QTableView::item {
-    padding: 5px; /* Espacement interne des éléments */
-    border: none; /* Pas de bordure interne */
-    white-space: nowrap; /* Empêche le texte de déborder */
-    text-overflow: ellipsis; /* Ajoute des points de suspension si nécessaire */
-}
-
-/* Style pour les en-têtes de colonnes */
-QHeaderView::section {
-    background-color: #213555; /* Fond bleu pour les en-têtes */
-    color: white; /* Texte en blanc pour les en-têtes */
-    padding: 5px; /* Espacement interne des en-têtes */
-    font-size: 12px; /* Taille de police plus petite pour les en-têtes */
-    border-bottom: 2px solid #2e4566; /* Bordure bleue plus foncée en bas */
-}
-
-/* Style pour les éléments sélectionnés */
-QTableView::item:selected {
-    background-color: #213555; /* Fond bleu pour la sélection */
-    color: white; /* Texte blanc pour la sélection */
-}
-
-/* Style pour le survol des éléments */
-QTableView::item:hover {
-    background-color: #1a2a3b; /* Fond bleu plus foncé au survol */
-    color: white; /* Texte blanc au survol */
-    cursor: pointer; /* Changement de curseur au survol */
-}
-</string>
+      <string notr="true"/>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineedit_old_nom">
@@ -1051,6 +1119,80 @@ QLineEdit:focus {
     box-shadow: 0 4px 10px rgba(30, 144, 255, 0.4); 
 }
 </string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButtonNotification">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>20</y>
+       <width>41</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <stylestrategy>NoAntialias</stylestrategy>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">image: url(:/bell.png);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QTableView" name="historyView">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>490</y>
+       <width>751</width>
+       <height>191</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_testarduino">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>170</y>
+       <width>93</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>test</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_arduinoff">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>170</y>
+       <width>93</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>test off</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_ard">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>40</y>
+       <width>63</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>I</string>
      </property>
     </widget>
    </widget>
