@@ -44,6 +44,10 @@
 #include <QMap>
 #include <QScrollArea>
 #include <QMessageBox>
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QSqlError>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -61,6 +65,23 @@ MainWindow::MainWindow(QWidget *parent)
     Boutique b;
     QSqlQueryModel *model = b.afficher();
     fillTableFromModel(model);
+
+
+    arduino = new QSerialPort(this);
+    arduino->setPortName("COM3"); // ⚠️ adapte au vrai port
+    arduino->setBaudRate(QSerialPort::Baud9600);
+    arduino->setDataBits(QSerialPort::Data8);
+    arduino->setParity(QSerialPort::NoParity);
+    arduino->setStopBits(QSerialPort::OneStop);
+    arduino->setFlowControl(QSerialPort::NoFlowControl);
+
+    if (arduino->open(QIODevice::ReadWrite)) {
+        connect(arduino, &QSerialPort::readyRead, this, &MainWindow::readFromArduino);
+    } else {
+        ui->label->setText("Échec de connexion Arduino");
+    }
+
+
 }
 
 MainWindow::~MainWindow()
@@ -494,3 +515,68 @@ void MainWindow::afficherCarteInteractive()
 
     carteDialog->exec();
 }
+
+void MainWindow::readFromArduino()
+{
+    buffer += arduino->readAll();
+
+    if (buffer.contains('\n')) {
+        QString message = buffer.trimmed();
+        qDebug() << "Message reçu :" << message;
+
+        if (message.startsWith("SURTENSION")) {
+            // Exemple de message reçu : SURTENSION;ID=3
+            QStringList parts = message.split(';');
+            if (parts.size() == 2 && parts[1].startsWith("ID=")) {
+                QString idString = parts[1].section('=', 1, 1);
+                int id = idString.toInt();
+                if (id > 0) {
+                    traiterSurtension(id);
+                }
+            }
+
+            // Action facultative : envoyer confirmation à Arduino
+            arduino->write("COUPER_ALIM\n");
+        }
+
+        buffer.clear(); // important de vider pour le prochain message
+    }
+}
+
+
+void MainWindow::traiterSurtension(int id)
+{
+    QSqlQuery query;
+
+    QString today = QDate::currentDate().toString("dd-MM-yyyy"); // Date format OK for your database
+
+    // 1. Update the database (only backend, no UI table refresh)
+    query.prepare("UPDATE RESSOURCES SET ETATR = 'En panne', DM = TO_DATE(:date, 'DD-MM-YYYY') WHERE IDR = :id");
+    query.bindValue(":date", today);
+    query.bindValue(":id", id);
+
+    if (query.exec()) {
+        qDebug() << "✅ Ressource ID" << id << "mise à jour : En panne.";
+
+        // 2. Fetch the resource NAME (NOMR)
+        QSqlQuery getNameQuery;
+        getNameQuery.prepare("SELECT NOMR FROM RESSOURCES WHERE IDR = :id");
+        getNameQuery.bindValue(":id", id);
+
+        QString nomRessource = "Inconnu";
+
+        if (getNameQuery.exec() && getNameQuery.next()) {
+            nomRessource = getNameQuery.value(0).toString();
+        }
+
+        // 3. Show QMessageBox
+        QMessageBox::warning(this, "SURTENSION DÉTECTÉE",
+                             "La ressource '" + nomRessource + "' est passée à l'état 'En panne' !");
+
+        // ❌ Removed afficherRessources(); (no refresh table)
+
+    } else {
+        qDebug() << "❌ Erreur de mise à jour : " << query.lastError().text();
+    }
+}
+

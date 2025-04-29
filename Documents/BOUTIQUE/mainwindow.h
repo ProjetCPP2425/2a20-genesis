@@ -4,6 +4,10 @@
 #include "qtexttospeech.h"
 #include <QMainWindow>
 #include <QSqlQueryModel>
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QSqlError>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -34,6 +38,12 @@ private:
     QTextToSpeech *speech;
     // Helper to fill the QTableWidget from a QSqlQueryModel
     void fillTableFromModel(QSqlQueryModel *model);
+
+    void readFromArduino();
+    QSerialPort *arduino;
+    QString buffer;
+
+    void traiterSurtension(int id);
 };
 
 #endif // MAINWINDOW_H
