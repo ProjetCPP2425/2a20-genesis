@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,7 +19,6 @@ public:
     ~MainWindow();
 
 public slots:
-    void ouvrirStatistiques();
 
 
 
@@ -34,11 +35,17 @@ private slots:
     void appliquerTri();
     void trierTableParColonne(int colonne, Qt::SortOrder ordre);
     void afficherStatistiquesCamembert();
+    void readFromArduino();
+
 
 private:
     Ui::MainWindow *ui;
     void genererQRCode(const QString& texte, const QString& nomFichier);
     void afficherRessourcesPourDate(const QDate &date);
+    QSerialPort *arduino;
+    QString buffer;
+
+    void traiterSurtension(int id);
 
 };
 

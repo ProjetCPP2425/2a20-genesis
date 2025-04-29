@@ -7,6 +7,7 @@
 QT += core gui widgets charts printsupport svg sql
 QT += charts
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += serialport sql
 
 TARGET = BOUTIQUE[master]
 TEMPLATE = app
@@ -17,6 +18,7 @@ CONFIG += c++11
 
 SOURCES += \
     Connection.cpp \
+    arduino.cpp \
     camembertdialog.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -26,6 +28,7 @@ SOURCES += \
 
 HEADERS += \
     Connection.h \
+    arduino.h \
     camembertdialog.h \
     mainwindow.h \
     qrcode.h \

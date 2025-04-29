@@ -68,6 +68,7 @@ public:
     QPushButton *pushButton_qr;
     QComboBox *comboBox_Tri;
     QPushButton *pushButton_Tri;
+    QLabel *label;
     QStatusBar *statusbar;
     QMenuBar *menuBar;
 
@@ -412,6 +413,9 @@ public:
         pushButton_Tri = new QPushButton(groupBox_3);
         pushButton_Tri->setObjectName("pushButton_Tri");
         pushButton_Tri->setGeometry(QRect(220, 40, 121, 41));
+        label = new QLabel(groupBox_3);
+        label->setObjectName("label");
+        label->setGeometry(QRect(20, 420, 321, 20));
         MainWindow->setCentralWidget(centralwidget);
         groupBox_3->raise();
         groupBox_2->raise();
@@ -480,6 +484,7 @@ public:
         pushButton_tri->setText(QCoreApplication::translate("MainWindow", "recherche", nullptr));
         pushButton_qr->setText(QCoreApplication::translate("MainWindow", "qrcode", nullptr));
         pushButton_Tri->setText(QCoreApplication::translate("MainWindow", "Tri", nullptr));
+        label->setText(QString());
     } // retranslateUi
 
 };

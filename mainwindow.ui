@@ -785,6 +785,19 @@ QLineEdit#searchBar:focus {
       <string>Tri</string>
      </property>
     </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>420</y>
+       <width>321</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </widget>
    <zorder>groupBox_3</zorder>
    <zorder>groupBox_2</zorder>

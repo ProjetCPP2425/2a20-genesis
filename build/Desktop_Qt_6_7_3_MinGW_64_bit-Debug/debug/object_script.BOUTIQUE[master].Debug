@@ -1,0 +1,11 @@
+debug/Connection.o
+debug/arduino.o
+debug/camembertdialog.o
+debug/main.o
+debug/mainwindow.o
+debug/qrcode.o
+debug/ressource.o
+debug/qrcodegen.o
+debug/moc_arduino.o
+debug/moc_camembertdialog.o
+debug/moc_mainwindow.o

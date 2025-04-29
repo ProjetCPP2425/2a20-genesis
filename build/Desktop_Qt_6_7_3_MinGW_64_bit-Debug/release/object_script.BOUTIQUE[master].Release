@@ -1,0 +1,11 @@
+release/Connection.o
+release/arduino.o
+release/camembertdialog.o
+release/main.o
+release/mainwindow.o
+release/qrcode.o
+release/ressource.o
+release/qrcodegen.o
+release/moc_arduino.o
+release/moc_camembertdialog.o
+release/moc_mainwindow.o

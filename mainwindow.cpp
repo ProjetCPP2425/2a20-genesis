@@ -23,6 +23,8 @@
 #include <QMessageBox>
 #include "camembertdialog.h"
 
+#include <QSerialPort>
+#include <QSerialPortInfo>
 
 
 
@@ -34,6 +36,20 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    arduino = new QSerialPort(this);
+    arduino->setPortName("COM3"); // ⚠️ adapte au vrai port
+    arduino->setBaudRate(QSerialPort::Baud9600);
+    arduino->setDataBits(QSerialPort::Data8);
+    arduino->setParity(QSerialPort::NoParity);
+    arduino->setStopBits(QSerialPort::OneStop);
+    arduino->setFlowControl(QSerialPort::NoFlowControl);
+
+    if (arduino->open(QIODevice::ReadWrite)) {
+        connect(arduino, &QSerialPort::readyRead, this, &MainWindow::readFromArduino);
+    } else {
+        ui->label->setText("Échec de connexion Arduino");
+    }
+
 
     ui->comboBox_Tri->addItems({
         "Tri par quantité (↑)",
@@ -340,9 +356,11 @@ protected:
 void MainWindow::afficherStatistiquesCamembert()
 {
     QMap<QString, int> ressources;
+
     for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
-        QString nom = ui->tableWidget->item(row, 0)->text();
-        int quantite = ui->tableWidget->item(row, 3)->text().toInt();
+        // ✅ Colonne 1 = Nom | Colonne 4 = Quantité
+        QString nom = ui->tableWidget->item(row, 1)->text();
+        int quantite = ui->tableWidget->item(row, 4)->text().toInt();
         ressources[nom] += quantite;
     }
 
@@ -609,34 +627,108 @@ void MainWindow::on_pushButton_qr_clicked()
 }
 void MainWindow::appliquerTri()
 {
-        QString mode = ui->comboBox_Tri->currentText();
+    QString mode = ui->comboBox_Tri->currentText();
 
-        // Trouver l’index de la colonne à trier
-        int colonneTri = -1;
-        Qt::SortOrder ordre = Qt::AscendingOrder;
+    int colonneTri = -1;
+    Qt::SortOrder ordre = Qt::AscendingOrder;
 
-        if (mode == "Tri par quantité (↑)") {
-            colonneTri = 3;  // Colonne "Quantité"
-            ordre = Qt::AscendingOrder;
-        } else if (mode == "Tri par quantité (↓)") {
-            colonneTri = 3;
-            ordre = Qt::DescendingOrder;
-        } else if (mode == "Tri par prix (↑)") {
-            colonneTri = 4;  // Colonne "Prix"
-            ordre = Qt::AscendingOrder;
-        } else if (mode == "Tri par prix (↓)") {
-            colonneTri = 4;
-            ordre = Qt::DescendingOrder;
+    if (mode == "Tri par quantité (↑)") {
+        colonneTri = 4;
+        ordre = Qt::AscendingOrder;
+    } else if (mode == "Tri par quantité (↓)") {
+        colonneTri = 4;
+        ordre = Qt::DescendingOrder;
+    } else if (mode == "Tri par prix (↑)") {
+        colonneTri = 5;
+        ordre = Qt::AscendingOrder;
+    } else if (mode == "Tri par prix (↓)") {
+        colonneTri = 5;
+        ordre = Qt::DescendingOrder;
+    }
+
+    if (colonneTri != -1) {
+        for (int i = 0; i < ui->tableWidget->rowCount(); ++i) {
+            QTableWidgetItem *item = ui->tableWidget->item(i, colonneTri);
+            if (item) {
+                item->setData(Qt::EditRole, item->text().toDouble());  // ✅ conversion en valeur numérique
+            }
         }
 
-        if (colonneTri != -1) {
-            ui->tableWidget->sortItems(colonneTri, ordre);
-        }
+        ui->tableWidget->sortItems(colonneTri, ordre);
+    }
 }
-
-
-
 void MainWindow::trierTableParColonne(int colonne, Qt::SortOrder ordre)
 {
-        ui->tableWidget->sortItems(colonne, ordre);
+    ui->tableWidget->sortItems(colonne, ordre);
 }
+
+
+
+
+void MainWindow::readFromArduino()
+{
+    buffer += arduino->readAll();
+
+    if (buffer.contains('\n')) {
+        QString message = buffer.trimmed();
+        qDebug() << "Message reçu :" << message;
+
+        if (message.startsWith("SURTENSION")) {
+            // Exemple de message reçu : SURTENSION;ID=3
+            QStringList parts = message.split(';');
+            if (parts.size() == 2 && parts[1].startsWith("ID=")) {
+                QString idString = parts[1].section('=', 1, 1);
+                int id = idString.toInt();
+                if (id > 0) {
+                    traiterSurtension(id);
+                }
+            }
+
+            // Action facultative : envoyer confirmation à Arduino
+            arduino->write("COUPER_ALIM\n");
+        }
+
+        buffer.clear(); // important de vider pour le prochain message
+    }
+}
+
+
+
+void MainWindow::traiterSurtension(int id)
+{
+    QSqlQuery query;
+
+    QString today = QDate::currentDate().toString("dd-MM-yyyy"); // Format date OK
+
+    // 🛠️ 1. Update the database: ETATR -> En panne, DM -> today
+    query.prepare("UPDATE RESSOURCES SET ETATR = 'En panne', DM = TO_DATE(:date, 'DD-MM-YYYY') WHERE IDR = :id");
+    query.bindValue(":date", today);
+    query.bindValue(":id", id);
+
+    if (query.exec()) {
+        qDebug() << "✅ Ressource ID" << id << "mise à jour : En panne.";
+
+        afficherRessources(); // Refresh the table
+
+        // 🛠️ 2. Get the name (NOMR) of the resource
+        QSqlQuery getNameQuery;
+        getNameQuery.prepare("SELECT NOMR FROM RESSOURCES WHERE IDR = :id");
+        getNameQuery.bindValue(":id", id);
+
+        QString nomRessource = "Inconnu";
+
+        if (getNameQuery.exec() && getNameQuery.next()) {
+            nomRessource = getNameQuery.value(0).toString();
+        }
+
+        // 🛠️ 3. Show QMessageBox with the resource NAME
+        QMessageBox::warning(this, "SURTENSION DÉTECTÉE",
+                             "La ressource '" + nomRessource + "' est passée à l'état 'En panne' !");
+    } else {
+        qDebug() << "❌ Erreur de mise à jour : " << query.lastError().text();
+    }
+}
+
+
+
+

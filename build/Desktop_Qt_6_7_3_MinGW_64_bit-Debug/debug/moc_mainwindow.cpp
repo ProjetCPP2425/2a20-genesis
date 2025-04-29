@@ -36,9 +36,8 @@ namespace {
 struct qt_meta_stringdata_CLASSMainWindowENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::stringData(
     "MainWindow",
-    "ouvrirStatistiques",
-    "",
     "afficherRessources",
+    "",
     "ajouterRessource",
     "modifierRessource",
     "supprimerRessource",
@@ -53,7 +52,8 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "colonne",
     "Qt::SortOrder",
     "ordre",
-    "afficherStatistiquesCamembert"
+    "afficherStatistiquesCamembert",
+    "readFromArduino"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -74,18 +74,18 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   92,    2, 0x0a,    1 /* Public */,
+       1,    0,   92,    2, 0x08,    1 /* Private */,
        3,    0,   93,    2, 0x08,    2 /* Private */,
        4,    0,   94,    2, 0x08,    3 /* Private */,
        5,    0,   95,    2, 0x08,    4 /* Private */,
        6,    0,   96,    2, 0x08,    5 /* Private */,
        7,    0,   97,    2, 0x08,    6 /* Private */,
-       8,    0,   98,    2, 0x08,    7 /* Private */,
-       9,    1,   99,    2, 0x08,    8 /* Private */,
+       8,    1,   98,    2, 0x08,    7 /* Private */,
+      10,    0,  101,    2, 0x08,    9 /* Private */,
       11,    0,  102,    2, 0x08,   10 /* Private */,
       12,    0,  103,    2, 0x08,   11 /* Private */,
-      13,    0,  104,    2, 0x08,   12 /* Private */,
-      14,    2,  105,    2, 0x08,   13 /* Private */,
+      13,    2,  104,    2, 0x08,   12 /* Private */,
+      17,    0,  109,    2, 0x08,   15 /* Private */,
       18,    0,  110,    2, 0x08,   16 /* Private */,
 
  // slots: parameters
@@ -95,12 +95,12 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,   10,
-    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    9,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, 0x80000000 | 16,   15,   17,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int, 0x80000000 | 15,   14,   16,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -115,8 +115,6 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSMainWindowENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<MainWindow, std::true_type>,
-        // method 'ouvrirStatistiques'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'afficherRessources'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'ajouterRessource'
@@ -143,6 +141,8 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<int, std::false_type>,
         QtPrivate::TypeAndForceComplete<Qt::SortOrder, std::false_type>,
         // method 'afficherStatistiquesCamembert'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'readFromArduino'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
@@ -154,18 +154,19 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         auto *_t = static_cast<MainWindow *>(_o);
         (void)_t;
         switch (_id) {
-        case 1: _t->afficherRessources(); break;
-        case 2: _t->ajouterRessource(); break;
-        case 3: _t->modifierRessource(); break;
-        case 4: _t->supprimerRessource(); break;
-        case 5: _t->exporterPDF(); break;
-        case 6: _t->TrierParDisponibilite(); break;
-        case 7: _t->on_comboBox_tri_currentTextChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 8: _t->afficherDatesMaintenance(); break;
-        case 9: _t->on_pushButton_qr_clicked(); break;
-        case 10: _t->appliquerTri(); break;
-        case 11: _t->trierTableParColonne((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<Qt::SortOrder>>(_a[2]))); break;
-        case 12: _t->afficherStatistiquesCamembert(); break;
+        case 0: _t->afficherRessources(); break;
+        case 1: _t->ajouterRessource(); break;
+        case 2: _t->modifierRessource(); break;
+        case 3: _t->supprimerRessource(); break;
+        case 4: _t->exporterPDF(); break;
+        case 5: _t->TrierParDisponibilite(); break;
+        case 6: _t->on_comboBox_tri_currentTextChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 7: _t->afficherDatesMaintenance(); break;
+        case 8: _t->on_pushButton_qr_clicked(); break;
+        case 9: _t->appliquerTri(); break;
+        case 10: _t->trierTableParColonne((*reinterpret_cast< std::add_pointer_t<int>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<Qt::SortOrder>>(_a[2]))); break;
+        case 11: _t->afficherStatistiquesCamembert(); break;
+        case 12: _t->readFromArduino(); break;
         default: ;
         }
     }

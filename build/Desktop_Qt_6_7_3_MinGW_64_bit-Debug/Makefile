@@ -232,6 +232,8 @@ Makefile: ../../resource.pro C:/Qt/6.7.3/mingw_64/mkspecs/win32-g++/qmake.conf C
 		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quicktimelineblendtrees_private.pri \
 		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quickwidgets.pri \
 		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quickwidgets_private.pri \
+		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_serialport.pri \
+		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_serialport_private.pri \
 		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_shadertools.pri \
 		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_shadertools_private.pri \
 		C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_sql.pri \
@@ -289,6 +291,7 @@ Makefile: ../../resource.pro C:/Qt/6.7.3/mingw_64/mkspecs/win32-g++/qmake.conf C
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Svg.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Gui.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Sql.prl \
+		C:/Qt/6.7.3/mingw_64/lib/Qt6SerialPort.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6Core.prl \
 		C:/Qt/6.7.3/mingw_64/lib/Qt6EntryPoint.prl \
 		C:/Qt/6.7.3/mingw_64/mkspecs/features/build_pass.prf
@@ -455,6 +458,8 @@ C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quicktimelineblendtrees.pri:
 C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quicktimelineblendtrees_private.pri:
 C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quickwidgets.pri:
 C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_quickwidgets_private.pri:
+C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_serialport.pri:
+C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_serialport_private.pri:
 C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_shadertools.pri:
 C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_shadertools_private.pri:
 C:/Qt/6.7.3/mingw_64/mkspecs/modules/qt_lib_sql.pri:
@@ -512,6 +517,7 @@ C:/Qt/6.7.3/mingw_64/lib/Qt6OpenGL.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Svg.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Gui.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Sql.prl:
+C:/Qt/6.7.3/mingw_64/lib/Qt6SerialPort.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6Core.prl:
 C:/Qt/6.7.3/mingw_64/lib/Qt6EntryPoint.prl:
 C:/Qt/6.7.3/mingw_64/mkspecs/features/build_pass.prf:
