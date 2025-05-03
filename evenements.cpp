@@ -131,10 +131,6 @@ bool evenement::supprimer(QString nom) {
 }
 
 void evenement::afficherStatistiques(QWidget *parent) {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
     // Create a new dialog window
     QDialog *statsDialog = new QDialog(parent);
     statsDialog->setWindowTitle("Statistiques des Événements");
@@ -143,12 +139,9 @@ void evenement::afficherStatistiques(QWidget *parent) {
     // Create layout for the dialog
     QHBoxLayout *layout = new QHBoxLayout(statsDialog);
 
-    // First chart: Distribution by Location
-    QDialog *statsDialog = new QDialog(parent);
     statsDialog->setWindowTitle("Statistiques des Événements");
     statsDialog->setMinimumSize(1250, 450);
 
-    QHBoxLayout *layout = new QHBoxLayout(statsDialog);//les éléments sont mis côte à côte
     QSqlQuery locationQuery;
     locationQuery.prepare("SELECT LIEU, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY LIEU");
 

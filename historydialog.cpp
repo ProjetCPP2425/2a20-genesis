@@ -1,4 +1,3 @@
-
 #include "HistoryDialog.h"
 #include <QPushButton>
 
@@ -39,11 +38,9 @@ HistoryDialog::HistoryDialog(QWidget *parent) : QDialog(parent)
         }
     )");
 
+    // Single layout instantiation
     layout = new QVBoxLayout(this);
-    layout = new QVBoxLayout(this);
-    layout = new QVBoxLayout(this);//layout vertival
     titleLabel = new QLabel("Event History Details:", this);
-
     historyListWidget = new QListWidget(this);
 
     layout->addWidget(titleLabel);

@@ -11,17 +11,27 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 CONFIG += c++17
 
 SOURCES += \
+    arduino.cpp \
+    camembertdialog.cpp \
     connection.cpp \
     evenements.cpp \
     historydialog.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    qrcode.cpp \
+    qrcodegen.cpp \
+    ressource.cpp
 
 HEADERS += \
+    arduino.h \
+    camembertdialog.h \
     connection.h \
     evenements.h \
     historydialog.h \
-    mainwindow.h
+    mainwindow.h \
+    qrcode.h \
+    qrcodegen.hpp \
+    ressource.h
 
 FORMS += \
     mainwindow.ui
