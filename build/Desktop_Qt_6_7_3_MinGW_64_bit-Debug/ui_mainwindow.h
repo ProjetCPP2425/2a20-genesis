@@ -66,9 +66,9 @@ public:
     QComboBox *comboBox_tri;
     QPushButton *pushButton_tri;
     QPushButton *pushButton_qr;
-    QComboBox *comboBox_Tri;
-    QPushButton *pushButton_Tri;
     QLabel *label;
+    QPushButton *pushButton_recherche;
+    QLineEdit *lineEdit_recherche;
     QStatusBar *statusbar;
     QMenuBar *menuBar;
 
@@ -310,7 +310,7 @@ public:
         label_17->setScaledContents(true);
         groupBox_3 = new QGroupBox(centralwidget);
         groupBox_3->setObjectName("groupBox_3");
-        groupBox_3->setGeometry(QRect(580, 10, 951, 771));
+        groupBox_3->setGeometry(QRect(600, 10, 951, 771));
         tableWidget = new QTableWidget(groupBox_3);
         if (tableWidget->columnCount() < 7)
             tableWidget->setColumnCount(7);
@@ -396,26 +396,23 @@ public:
         pushButton_modif->setObjectName("pushButton_modif");
         pushButton_modif->setGeometry(QRect(650, 400, 61, 41));
         comboBox_tri = new QComboBox(groupBox_3);
-        comboBox_tri->addItem(QString());
-        comboBox_tri->addItem(QString());
-        comboBox_tri->addItem(QString());
         comboBox_tri->setObjectName("comboBox_tri");
-        comboBox_tri->setGeometry(QRect(690, 40, 221, 31));
+        comboBox_tri->setGeometry(QRect(290, 40, 221, 31));
         pushButton_tri = new QPushButton(groupBox_3);
         pushButton_tri->setObjectName("pushButton_tri");
-        pushButton_tri->setGeometry(QRect(550, 40, 121, 41));
+        pushButton_tri->setGeometry(QRect(150, 40, 121, 41));
         pushButton_qr = new QPushButton(groupBox_3);
         pushButton_qr->setObjectName("pushButton_qr");
         pushButton_qr->setGeometry(QRect(350, 400, 121, 41));
-        comboBox_Tri = new QComboBox(groupBox_3);
-        comboBox_Tri->setObjectName("comboBox_Tri");
-        comboBox_Tri->setGeometry(QRect(360, 40, 171, 31));
-        pushButton_Tri = new QPushButton(groupBox_3);
-        pushButton_Tri->setObjectName("pushButton_Tri");
-        pushButton_Tri->setGeometry(QRect(220, 40, 121, 41));
         label = new QLabel(groupBox_3);
         label->setObjectName("label");
         label->setGeometry(QRect(20, 420, 321, 20));
+        pushButton_recherche = new QPushButton(groupBox_3);
+        pushButton_recherche->setObjectName("pushButton_recherche");
+        pushButton_recherche->setGeometry(QRect(560, 40, 121, 41));
+        lineEdit_recherche = new QLineEdit(groupBox_3);
+        lineEdit_recherche->setObjectName("lineEdit_recherche");
+        lineEdit_recherche->setGeometry(QRect(700, 50, 181, 31));
         MainWindow->setCentralWidget(centralwidget);
         groupBox_3->raise();
         groupBox_2->raise();
@@ -477,14 +474,10 @@ public:
         pushButton_pdf->setText(QCoreApplication::translate("MainWindow", "Exporter PDF", nullptr));
         pushButton_supp->setText(QCoreApplication::translate("MainWindow", "\360\237\227\221\357\270\217", nullptr));
         pushButton_modif->setText(QCoreApplication::translate("MainWindow", "\342\234\217\357\270\217", nullptr));
-        comboBox_tri->setItemText(0, QCoreApplication::translate("MainWindow", "Type", nullptr));
-        comboBox_tri->setItemText(1, QCoreApplication::translate("MainWindow", "Prix", nullptr));
-        comboBox_tri->setItemText(2, QCoreApplication::translate("MainWindow", "Localisation", nullptr));
-
-        pushButton_tri->setText(QCoreApplication::translate("MainWindow", "recherche", nullptr));
+        pushButton_tri->setText(QCoreApplication::translate("MainWindow", "Tri", nullptr));
         pushButton_qr->setText(QCoreApplication::translate("MainWindow", "qrcode", nullptr));
-        pushButton_Tri->setText(QCoreApplication::translate("MainWindow", "Tri", nullptr));
         label->setText(QString());
+        pushButton_recherche->setText(QCoreApplication::translate("MainWindow", "Recherche", nullptr));
     } // retranslateUi
 
 };

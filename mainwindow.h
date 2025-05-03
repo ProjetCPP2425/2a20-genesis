@@ -29,14 +29,13 @@ private slots:
     void supprimerRessource();
     void exporterPDF();
     void TrierParDisponibilite();
-    void on_comboBox_tri_currentTextChanged(const QString &etat);
     void afficherDatesMaintenance();
     void on_pushButton_qr_clicked();
-    void appliquerTri();
-    void trierTableParColonne(int colonne, Qt::SortOrder ordre);
+    //void appliquerTri();
+    //void trierTableParColonne(int colonne, Qt::SortOrder ordre);
     void afficherStatistiquesCamembert();
     void readFromArduino();
-
+    void filtrerRessources();
 
 private:
     Ui::MainWindow *ui;

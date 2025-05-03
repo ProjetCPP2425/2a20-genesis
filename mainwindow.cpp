@@ -51,12 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 
-    ui->comboBox_Tri->addItems({
-        "Tri par quantité (↑)",
-        "Tri par quantité (↓)",
-        "Tri par prix (↑)",
-        "Tri par prix (↓)"
-    });
 
     // Validation : Le nom et le type ne doivent contenir que des lettres et des espaces
     QRegularExpression regexNomType("^[A-Za-zÀ-ÖØ-öø-ÿ\\s]+$");
@@ -82,22 +76,23 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_supp, &QPushButton::clicked, this, &MainWindow::supprimerRessource);
     connect(ui->pushButton_stats, &QPushButton::clicked, this, &MainWindow::afficherStatistiquesCamembert);
     connect(ui->pushButton_pdf, &QPushButton::clicked, this, &MainWindow::exporterPDF);
-    connect(ui->pushButton_tri, &QPushButton::clicked, this, &MainWindow::TrierParDisponibilite);
-    connect(ui->calendar_maintenance, &QCalendarWidget::clicked, this, &MainWindow::afficherRessourcesPourDate);
-    connect(ui->pushButton_Tri, &QPushButton::clicked, this, [=]() {
-        QString mode = ui->comboBox_Tri->currentText();  // ou le vrai nom de ta comboBox
-
-        if (mode == "Tri par quantité (↑)") {
-            trierTableParColonne(3, Qt::AscendingOrder);  // colonne 3 = Quantité
-        } else if (mode == "Tri par quantité (↓)") {
-            trierTableParColonne(3, Qt::DescendingOrder);
-        } else if (mode == "Tri par prix (↑)") {
-            trierTableParColonne(4, Qt::AscendingOrder);  // colonne 4 = Prix
-        } else if (mode == "Tri par prix (↓)") {
-            trierTableParColonne(4, Qt::DescendingOrder);
-        }
+    connect(ui->comboBox_tri, &QComboBox::currentTextChanged, this, &MainWindow::TrierParDisponibilite);
+    ui->comboBox_tri->clear();  // 🔁 Évite la duplication
+    ui->comboBox_tri->addItems({
+        "Tout afficher",
+        "Disponible",
+        "En panne",
+        "En maintenance",
+        "Réservé",
+        "Tri par prix (↑)",
+        "Tri par prix (↓)"
     });
-
+    connect(ui->calendar_maintenance, &QCalendarWidget::clicked, this, &MainWindow::afficherRessourcesPourDate);
+    connect(ui->lineEdit_recherche, &QLineEdit::textChanged, this, &MainWindow::filtrerRessources);
+    connect(ui->pushButton_recherche, &QPushButton::clicked, this, [=]() {
+        ui->lineEdit_recherche->clear();         // Vide le champ
+        filtrerRessources();                     // Réaffiche tout
+    });
 
     afficherRessources();
 }
@@ -133,18 +128,23 @@ void MainWindow::afficherRessources()
 
 void MainWindow::ajouterRessource()
 {
-    if (ui->lineEdit_11->text().isEmpty() || ui->comboBox_type->currentText().isEmpty() ||
-        ui->comboBox_etat->currentText().isEmpty() || ui->lineEdit_7->text().isEmpty() ||
-        ui->lineEdit_8->text().isEmpty() || ui->lineEdit_9->text().isEmpty())
+    // Vérifie que tous les champs nécessaires sont remplis
+    if (ui->lineEdit_11->text().isEmpty() ||
+        ui->comboBox_type->currentText().isEmpty() ||
+        ui->comboBox_etat->currentText().isEmpty() ||
+        ui->lineEdit_7->text().isEmpty() ||
+        ui->lineEdit_8->text().isEmpty() ||
+        ui->lineEdit_9->text().isEmpty())
     {
         QMessageBox::warning(this, "Erreur", "Tous les champs doivent être remplis.");
         return;
     }
 
+    // Vérifie la validité des champs numériques
     bool ok;
     int quantite = ui->lineEdit_7->text().toInt(&ok);
     if (!ok || quantite < 0) {
-        QMessageBox::warning(this, "Erreur", "Quantité invalide (doit être un nombre positif).");
+        QMessageBox::warning(this, "Erreur", "Quantité invalide (doit être un entier positif).");
         return;
     }
 
@@ -156,44 +156,57 @@ void MainWindow::ajouterRessource()
 
     QDate dateAchat = ui->dateEdit_3->date();
     QDate dateMaintenance = ui->dateEdit_4->date();
+
     if (dateMaintenance < dateAchat) {
         QMessageBox::warning(this, "Erreur", "La date de maintenance ne peut pas être antérieure à la date d'achat.");
         return;
     }
 
+    // Préparation de la requête SQL d'insertion
     QSqlQuery query;
     query.prepare(R"(
         INSERT INTO RESSOURCES (IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM)
-        VALUES (RESSOURCES_SEQ.NEXTVAL, :nom, :type, 'Disponible', :quantite, :prix, :localisation,
+        VALUES (RESSOURCES_SEQ.NEXTVAL, :nom, :type, :etat, :quantite, :prix, :localisation,
                 TO_DATE(:dateAchat, 'DD-MM-YYYY'), TO_DATE(:dateMaintenance, 'DD-MM-YYYY'))
     )");
 
-    query.bindValue(":nom", ui->lineEdit_11->text());
+    // Liaison des valeurs
+    query.bindValue(":nom", ui->lineEdit_11->text().trimmed());
     query.bindValue(":type", ui->comboBox_type->currentText());
+    query.bindValue(":etat", ui->comboBox_etat->currentText());
     query.bindValue(":quantite", quantite);
     query.bindValue(":prix", prix);
-    query.bindValue(":localisation", ui->lineEdit_9->text());
+    query.bindValue(":localisation", ui->lineEdit_9->text().trimmed());
     query.bindValue(":dateAchat", dateAchat.toString("dd-MM-yyyy"));
     query.bindValue(":dateMaintenance", dateMaintenance.toString("dd-MM-yyyy"));
 
     if (!query.exec()) {
         QMessageBox::warning(this, "Erreur", "Erreur lors de l'ajout : " + query.lastError().text());
-        qDebug() << "SQL Error: " << query.lastError().text();
+        qDebug() << "Erreur SQL : " << query.lastError().text();
         return;
     }
 
-    // ✅ Génération automatique du code QR
+    // ✅ Génération d’un QR code avec le nom
     QString chemin = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
-                     + "/" + ui->lineEdit_11->text() + "_QRCode.png";
-    genererQRCode(ui->lineEdit_11->text(), chemin);
+                     + "/" + ui->lineEdit_11->text().trimmed() + "_QRCode.png";
+    genererQRCode(ui->lineEdit_11->text().trimmed(), chemin);
 
-    // ✅ Mise à jour interface
     QMessageBox::information(this, "Succès", "Ressource ajoutée avec succès.");
+
+    // Rafraîchissement de l’interface
     afficherRessources();
-    on_comboBox_tri_currentTextChanged(ui->comboBox_tri->currentText());
     afficherDatesMaintenance();
+    TrierParDisponibilite();
 
-
+    // Nettoyage des champs
+    ui->lineEdit_11->clear();
+    ui->comboBox_type->setCurrentIndex(-1);
+    ui->comboBox_etat->setCurrentIndex(-1);
+    ui->lineEdit_7->clear();
+    ui->lineEdit_8->clear();
+    ui->lineEdit_9->clear();
+    ui->dateEdit_3->clear();
+    ui->dateEdit_4->clear();
 }
 
 
@@ -211,18 +224,19 @@ void MainWindow::modifierRessource()
     int idR = ui->tableWidget->item(selectedRow, 0)->text().toInt();
 
     // Récupérer les anciennes valeurs
+    QString oldNom = ui->tableWidget->item(selectedRow, 1)->text();
     QString oldType = ui->tableWidget->item(selectedRow, 2)->text();
     QString oldEtat = ui->tableWidget->item(selectedRow, 3)->text();
     int oldQuantite = ui->tableWidget->item(selectedRow, 4)->text().toInt();
     float oldPrix = ui->tableWidget->item(selectedRow, 5)->text().toFloat();
     QString oldLocalisation = ui->tableWidget->item(selectedRow, 6)->text();
-    QDate oldDateAchat = QDate::fromString(ui->tableWidget->item(selectedRow, 7)->text(), "dd-MM-yyyy");
-    QDate oldDateMaintenance = QDate::fromString(ui->tableWidget->item(selectedRow, 8)->text(), "dd-MM-yyyy");
+    QDate oldDateAchat = QDate::fromString(ui->tableWidget->item(selectedRow, 7)->text(), "yyyy-MM-dd");
+    QDate oldDateMaintenance = QDate::fromString(ui->tableWidget->item(selectedRow, 8)->text(), "yyyy-MM-dd");
 
     // Nouvelles valeurs (ou anciennes si vide)
-    QString nom = ui->lineEdit_11->text().trimmed();
-    QString type = ui->comboBox_type->currentText();
-    QString etat = ui->comboBox_etat->currentText();
+    QString nom = ui->lineEdit_11->text().trimmed().isEmpty() ? oldNom : ui->lineEdit_11->text().trimmed();
+    QString type = ui->comboBox_type->currentText().isEmpty() ? oldType : ui->comboBox_type->currentText();
+    QString etat = ui->comboBox_etat->currentText().isEmpty() ? oldEtat : ui->comboBox_etat->currentText();
     int quantite = ui->lineEdit_7->text().trimmed().isEmpty() ? oldQuantite : ui->lineEdit_7->text().trimmed().toInt();
     float prix = ui->lineEdit_8->text().trimmed().isEmpty() ? oldPrix : ui->lineEdit_8->text().trimmed().toFloat();
     QString localisation = ui->lineEdit_9->text().trimmed().isEmpty() ? oldLocalisation : ui->lineEdit_9->text().trimmed();
@@ -267,8 +281,9 @@ void MainWindow::modifierRessource()
     QMessageBox::information(this, "Succès", "Ressource modifiée avec succès !");
     afficherRessources();
     afficherDatesMaintenance();
-    on_comboBox_tri_currentTextChanged(ui->comboBox_tri->currentText());
+    TrierParDisponibilite();
 
+    // Nettoyage
     ui->lineEdit_11->clear();
     ui->comboBox_type->setCurrentIndex(-1);
     ui->comboBox_etat->setCurrentIndex(-1);
@@ -289,21 +304,28 @@ void MainWindow::supprimerRessource()
         return;
     }
 
-    QString nom = ui->tableWidget->item(selectedRow, 0)->text();
+    // ✅ On récupère l'ID de la ressource (colonne 0 cachée)
+    int id = ui->tableWidget->item(selectedRow, 0)->text().toInt();
+
+    // ✅ Pour affichage plus clair dans le message
+    QString nom = ui->tableWidget->item(selectedRow, 1)->text();
 
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Confirmation", "Voulez-vous vraiment supprimer cette ressource ?", QMessageBox::Yes | QMessageBox::No);
+    reply = QMessageBox::question(
+        this, "Confirmation",
+        "Voulez-vous vraiment supprimer la ressource '" + nom + "' ?",
+        QMessageBox::Yes | QMessageBox::No
+        );
 
     if (reply == QMessageBox::Yes) {
         QSqlQuery query;
-        query.prepare("DELETE FROM RESSOURCES WHERE NOMR=:nom");
-        query.bindValue(":nom", nom);
+        query.prepare("DELETE FROM RESSOURCES WHERE IDR = :id");
+        query.bindValue(":id", id);
 
         if (query.exec()) {
             QMessageBox::information(this, "Succès", "Ressource supprimée avec succès.");
             afficherRessources();
-            afficherDatesMaintenance();  // ⬅️ ajoute cette ligne
-
+            afficherDatesMaintenance();
         } else {
             QMessageBox::warning(this, "Erreur", "Erreur lors de la suppression : " + query.lastError().text());
         }
@@ -479,52 +501,71 @@ void MainWindow::exporterPDF()
 
 void MainWindow::TrierParDisponibilite()
 {
-    QString etat = ui->comboBox_tri->currentText();
-    QSqlQuery query;
+    QString choix = ui->comboBox_tri->currentText();
+    QString conditionEtat;
+    QString tri;
 
-    if (etat == "Tout afficher") {
-        query.prepare("SELECT NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM RESSOURCES");
-    } else {
-        query.prepare("SELECT NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM RESSOURCES WHERE ETATR = :etat");
-        query.bindValue(":etat", etat);
+    // 1. Gestion de la condition d'état
+    if (choix == "Disponible" || choix == "En panne" || choix == "En maintenance" || choix == "Réservé") {
+        conditionEtat = " WHERE ETATR = :etat";
     }
 
+    // 2. Gestion du tri
+    if (choix == "Tri par prix (↑)") {
+        tri = " ORDER BY PRIXR ASC";
+    } else if (choix == "Tri par prix (↓)") {
+        tri = " ORDER BY PRIXR DESC";
+    }
+
+    // 3. Cas combiné : état + tri par prix
+    QString etatFiltre = "";
+    if (conditionEtat.contains(":etat")) {
+        etatFiltre = choix;  // le texte correspond directement à l’état
+    }
+
+    // 4. Requête SQL
+    QString queryStr = "SELECT IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM RESSOURCES" + conditionEtat + tri;
+    QSqlQuery query;
+    query.prepare(queryStr);
+    if (!etatFiltre.isEmpty()) query.bindValue(":etat", etatFiltre);
+
     if (!query.exec()) {
-        QMessageBox::warning(this, "Erreur", "Erreur lors de l'affichage : " + query.lastError().text());
+        QMessageBox::warning(this, "Erreur", "Erreur lors de la récupération : " + query.lastError().text());
         return;
     }
 
+    // 5. Affichage dans le tableau
     ui->tableWidget->setRowCount(0);
     int row = 0;
-
     while (query.next()) {
         ui->tableWidget->insertRow(row);
-        for (int col = 0; col < 8; col++) {
-            ui->tableWidget->setItem(row, col, new QTableWidgetItem(query.value(col).toString()));
+        for (int col = 0; col < 9; ++col) {
+            QTableWidgetItem *item = new QTableWidgetItem(query.value(col).toString());
+            if (col == 0) item->setFlags(item->flags() & ~Qt::ItemIsEditable);  // ID non modifiable
+            ui->tableWidget->setItem(row, col, item);
         }
         row++;
     }
-}
-void MainWindow::on_comboBox_tri_currentTextChanged(const QString &etat)
-{
-    if (etat == "Disponible" || etat == "En panne" || etat == "En maintenance" || etat == "Réservé") {
-        QSqlQuery query;
-        query.prepare("SELECT NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM RESSOURCES WHERE ETATR = :etat");
-        query.bindValue(":etat", etat);
 
-        if (query.exec()) {
-            ui->tableWidget->setRowCount(0);
-            int row = 0;
-            while (query.next()) {
-                ui->tableWidget->insertRow(row);
-                for (int col = 0; col < 8; ++col) {
-                    ui->tableWidget->setItem(row, col, new QTableWidgetItem(query.value(col).toString()));
-                }
-                row++;
+    ui->tableWidget->setColumnHidden(0, true);  // Cacher colonne ID
+}
+
+void MainWindow::filtrerRessources()
+{
+    QString texteRecherche = ui->lineEdit_recherche->text().trimmed();
+
+    for (int i = 0; i < ui->tableWidget->rowCount(); ++i) {
+        bool afficher = false;
+
+        for (int j = 0; j < ui->tableWidget->columnCount(); ++j) {
+            QTableWidgetItem *item = ui->tableWidget->item(i, j);
+            if (item && item->text().contains(texteRecherche, Qt::CaseInsensitive)) {
+                afficher = true;
+                break;
             }
         }
-    } else {
-        afficherRessources();  // Si on sélectionne une valeur vide ou par défaut, on affiche tout
+
+        ui->tableWidget->setRowHidden(i, !afficher);
     }
 }
 
@@ -611,58 +652,60 @@ void MainWindow::on_pushButton_qr_clicked()
         return;
     }
 
-    QString nomRessource = ui->tableWidget->item(selectedRow, 0)->text();  // Colonne 0 = Nom
+    // Récupération des données
+    QString nom = ui->tableWidget->item(selectedRow, 1)->text();
+    QString type = ui->tableWidget->item(selectedRow, 2)->text();
+    QString etat = ui->tableWidget->item(selectedRow, 3)->text();
+    QString quantite = ui->tableWidget->item(selectedRow, 4)->text();
+    QString prix = ui->tableWidget->item(selectedRow, 5)->text();
+    QString localisation = ui->tableWidget->item(selectedRow, 6)->text();
+    QString dateAchat = ui->tableWidget->item(selectedRow, 7)->text();
+    QString dateMaintenance = ui->tableWidget->item(selectedRow, 8)->text();
 
-    // Demander l'emplacement du fichier
-    QString chemin = QFileDialog::getSaveFileName(this, "Enregistrer le QR Code", nomRessource + ".png", "Images PNG (*.png)");
-    if (chemin.isEmpty())
-        return;
+    // Contenu du QR Code
+    QString contenuQR =
+        "Nom : " + nom + "\n" +
+        "Type : " + type + "\n" +
+        "État : " + etat + "\n" +
+        "Quantité : " + quantite + "\n" +
+        "Prix : " + prix + "\n" +
+        "Localisation : " + localisation + "\n" +
+        "Date d'achat : " + dateAchat + "\n" +
+        "Date maintenance : " + dateMaintenance;
 
-    // Générer le QR code
-    if (QrCodeGenerator::genererQRCode(nomRessource, chemin)) {
-        QMessageBox::information(this, "Succès", "QR Code généré et enregistré avec succès !");
-    } else {
-        QMessageBox::critical(this, "Erreur", "Échec de la génération du QR Code.");
-    }
-}
-void MainWindow::appliquerTri()
-{
-    QString mode = ui->comboBox_Tri->currentText();
+    // Génération du QR Code
+    const QrCode qr = QrCode::encodeText(contenuQR.toUtf8().constData(), QrCode::Ecc::LOW);
+    const int taille = qr.getSize();
+    const int echelle = 10;
+    const int imageSize = taille * echelle;
 
-    int colonneTri = -1;
-    Qt::SortOrder ordre = Qt::AscendingOrder;
+    QImage image(imageSize, imageSize, QImage::Format_RGB32);
+    image.fill(Qt::white);
 
-    if (mode == "Tri par quantité (↑)") {
-        colonneTri = 4;
-        ordre = Qt::AscendingOrder;
-    } else if (mode == "Tri par quantité (↓)") {
-        colonneTri = 4;
-        ordre = Qt::DescendingOrder;
-    } else if (mode == "Tri par prix (↑)") {
-        colonneTri = 5;
-        ordre = Qt::AscendingOrder;
-    } else if (mode == "Tri par prix (↓)") {
-        colonneTri = 5;
-        ordre = Qt::DescendingOrder;
-    }
-
-    if (colonneTri != -1) {
-        for (int i = 0; i < ui->tableWidget->rowCount(); ++i) {
-            QTableWidgetItem *item = ui->tableWidget->item(i, colonneTri);
-            if (item) {
-                item->setData(Qt::EditRole, item->text().toDouble());  // ✅ conversion en valeur numérique
+    QPainter painter(&image);
+    painter.setBrush(Qt::black);
+    for (int y = 0; y < taille; ++y) {
+        for (int x = 0; x < taille; ++x) {
+            if (qr.getModule(x, y)) {
+                painter.drawRect(x * echelle, y * echelle, echelle, echelle);
             }
         }
-
-        ui->tableWidget->sortItems(colonneTri, ordre);
     }
-}
-void MainWindow::trierTableParColonne(int colonne, Qt::SortOrder ordre)
-{
-    ui->tableWidget->sortItems(colonne, ordre);
-}
+    painter.end();
 
+    // Affichage dans QMessageBox
+    QPixmap qrPixmap = QPixmap::fromImage(image);
+    QLabel* label = new QLabel;
+    label->setPixmap(qrPixmap.scaled(250, 250, Qt::KeepAspectRatio));
 
+    QVBoxLayout* layout = new QVBoxLayout;
+    layout->addWidget(label);
+
+    QDialog* dialog = new QDialog(this);
+    dialog->setWindowTitle("QR Code - Informations Ressource");
+    dialog->setLayout(layout);
+    dialog->exec();
+}
 
 
 void MainWindow::readFromArduino()
@@ -698,9 +741,8 @@ void MainWindow::traiterSurtension(int id)
 {
     QSqlQuery query;
 
-    QString today = QDate::currentDate().toString("dd-MM-yyyy"); // Format date OK
+    QString today = QDate::currentDate().toString("dd-MM-yyyy"); // Date du jour
 
-    // 🛠️ 1. Update the database: ETATR -> En panne, DM -> today
     query.prepare("UPDATE RESSOURCES SET ETATR = 'En panne', DM = TO_DATE(:date, 'DD-MM-YYYY') WHERE IDR = :id");
     query.bindValue(":date", today);
     query.bindValue(":id", id);
@@ -708,9 +750,9 @@ void MainWindow::traiterSurtension(int id)
     if (query.exec()) {
         qDebug() << "✅ Ressource ID" << id << "mise à jour : En panne.";
 
-        afficherRessources(); // Refresh the table
+        afficherRessources(); // Refresh du tableau
 
-        // 🛠️ 2. Get the name (NOMR) of the resource
+        // 1. On récupère le NOM de la ressource
         QSqlQuery getNameQuery;
         getNameQuery.prepare("SELECT NOMR FROM RESSOURCES WHERE IDR = :id");
         getNameQuery.bindValue(":id", id);
@@ -721,7 +763,11 @@ void MainWindow::traiterSurtension(int id)
             nomRessource = getNameQuery.value(0).toString();
         }
 
-        // 🛠️ 3. Show QMessageBox with the resource NAME
+        // 2. Envoyer à Arduino
+        QString message = "NOM:" + nomRessource + "\n"; // ➔ Ex : NOM:Ordinateur\n
+        arduino->write(message.toUtf8()); // on envoie en format texte UTF8
+
+        // 3. Popup Qt
         QMessageBox::warning(this, "SURTENSION DÉTECTÉE",
                              "La ressource '" + nomRessource + "' est passée à l'état 'En panne' !");
     } else {

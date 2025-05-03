@@ -475,7 +475,7 @@ QLineEdit#searchBar:focus {
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>580</x>
+      <x>600</x>
       <y>10</y>
       <width>951</width>
       <height>771</height>
@@ -714,39 +714,24 @@ QLineEdit#searchBar:focus {
     <widget class="QComboBox" name="comboBox_tri">
      <property name="geometry">
       <rect>
-       <x>690</x>
+       <x>290</x>
        <y>40</y>
        <width>221</width>
        <height>31</height>
       </rect>
      </property>
-     <item>
-      <property name="text">
-       <string>Type</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Prix</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Localisation</string>
-      </property>
-     </item>
     </widget>
     <widget class="QPushButton" name="pushButton_tri">
      <property name="geometry">
       <rect>
-       <x>550</x>
+       <x>150</x>
        <y>40</y>
        <width>121</width>
        <height>41</height>
       </rect>
      </property>
      <property name="text">
-      <string>recherche</string>
+      <string>Tri</string>
      </property>
     </widget>
     <widget class="QPushButton" name="pushButton_qr">
@@ -762,29 +747,6 @@ QLineEdit#searchBar:focus {
       <string>qrcode</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox_Tri">
-     <property name="geometry">
-      <rect>
-       <x>360</x>
-       <y>40</y>
-       <width>171</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_Tri">
-     <property name="geometry">
-      <rect>
-       <x>220</x>
-       <y>40</y>
-       <width>121</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Tri</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
@@ -796,6 +758,29 @@ QLineEdit#searchBar:focus {
      </property>
      <property name="text">
       <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_recherche">
+     <property name="geometry">
+      <rect>
+       <x>560</x>
+       <y>40</y>
+       <width>121</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Recherche</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_recherche">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>50</y>
+       <width>181</width>
+       <height>31</height>
+      </rect>
      </property>
     </widget>
    </widget>
