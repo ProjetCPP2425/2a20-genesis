@@ -144,17 +144,11 @@ void evenement::afficherStatistiques(QWidget *parent) {
     QHBoxLayout *layout = new QHBoxLayout(statsDialog);
 
     // First chart: Distribution by Location
-<<<<<<< HEAD
-=======
-=======
     QDialog *statsDialog = new QDialog(parent);
     statsDialog->setWindowTitle("Statistiques des Événements");
     statsDialog->setMinimumSize(1250, 450);
 
     QHBoxLayout *layout = new QHBoxLayout(statsDialog);//les éléments sont mis côte à côte
-
->>>>>>> 8a1c2a3 (final)
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
     QSqlQuery locationQuery;
     locationQuery.prepare("SELECT LIEU, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY LIEU");
 
@@ -172,15 +166,6 @@ void evenement::afficherStatistiques(QWidget *parent) {
         int count = locationQuery.value(1).toInt();
         locationSeries->append(location, count);
     }
-
-<<<<<<< HEAD
-    // Second chart: Distribution by Sponsors
-=======
-<<<<<<< HEAD
-    // Second chart: Distribution by Sponsors
-=======
->>>>>>> 8a1c2a3 (final)
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
     QSqlQuery sponsorQuery;
     sponsorQuery.prepare("SELECT SPONSORS, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY SPONSORS");
 
@@ -199,14 +184,6 @@ void evenement::afficherStatistiques(QWidget *parent) {
         sponsorSeries->append(sponsor, count);
     }
 
-<<<<<<< HEAD
-    // Customize both series
-=======
-<<<<<<< HEAD
-    // Customize both series
-=======
->>>>>>> 8a1c2a3 (final)
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
     for (QPieSlice *slice : locationSeries->slices()) {
         slice->setLabel(slice->label() + " (" + QString::number(slice->percentage() * 100, 'f', 1) + "%)");
     }
@@ -251,24 +228,14 @@ QSqlQueryModel* evenement::searchByName(const QString &name)
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
     query.prepare("SELECT * FROM evenements WHERE nom LIKE :name");
-<<<<<<< HEAD
     query.bindValue(":name", "%" + name + "%");  // Use LIKE for partial matches
-=======
-<<<<<<< HEAD
     query.bindValue(":name", "%" + name + "%");  // Use LIKE for partial matches
-=======
     query.bindValue(":name", "%" + name + "%");
->>>>>>> 8a1c2a3 (final)
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
     query.exec();
     model->setQuery(query);
     return model;
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
 /*
 QSqlQueryModel* evenement::getPastEvents() {
     QSqlQueryModel *model = new QSqlQueryModel();
@@ -287,12 +254,6 @@ QSqlQueryModel* evenement::getPastEvents() {
     return model;
 }
 */
-
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 8a1c2a3 (final)
->>>>>>> 983537a7dd52ff7ff4e5d09ae92c7113c9018da9
 
 QSqlQueryModel* evenement::trier(const QString& critere, const QString& ordre) {
     QSqlQueryModel* model = new QSqlQueryModel();
