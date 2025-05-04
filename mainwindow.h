@@ -98,7 +98,7 @@ private slots:
     void readFromArduinol();
     bool checkRFIDInDatabase(const QString& cardID);
     void fillTableFromModell(QSqlQueryModel *modell);
-
+////
 
     void on_gesl_clicked();
     void on_gesb_clicked();
