@@ -39,6 +39,80 @@
 #include "qrcode.h"
 #include "qrcodegen.hpp"
 
+//////LOCA
+
+#include <QMessageBox>
+#include "locataire.h"
+#include <QRegularExpression>
+#include <QString>
+#include <QProcess>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QFileDialog>
+#include <QtCharts>
+#include <QModelIndex>
+#include "mailing.h"
+#include <QTableWidgetItem>
+
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QPageLayout>
+
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+
+
+
+/////BOUTique
+
+#include "boutique.h"
+#include <QMessageBox>
+#include <QSqlQueryModel>
+#include <QTableWidgetItem>
+#include <QPixmap>
+#include <QRegularExpression>
+#include <QSqlQuery>
+#include <QSqlQueryModel>
+#include <QTableWidgetItem>
+#include <QPixmap>
+#include <QRegularExpression>
+#include <QFileDialog>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QTextStream>
+#include <QPageSize>
+#include "statistique.h"
+#include <QTextToSpeech>
+#include <QInputDialog>
+#include <QComboBox>
+#include <QDate>
+#include <QTime>
+#include <QLocale>
+#include <QApplication>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QDialog>
+#include<QMap>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QScrollArea>
+#include <QMessageBox>
+#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QSqlError>
+#include <QJsonArray>
+#include <QJsonValue>
+
+
 using qrcodegen::QrCode;
 using qrcodegen::QrSegment;
 
@@ -48,6 +122,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    locataires l;
+    QSqlQueryModel *modell = l.aff();
+    fillTableFromModell(modell);
+
+    pixmap = new QPixmap("C:/Users/youss/OneDrive/Desktop/Sch/ProjC++/7.png"); // Replace with the actual image path
+    if (!pixmap->isNull()) {
+        ui->label_16->setPixmap(pixmap->scaled(ui->label_16->size(), Qt::KeepAspectRatio));
+    }
+    connect(ui->localisation, &QPushButton::clicked, this, &MainWindow::afficherCarteInteractive);
+    QPixmap pixmap2("C:/Users/youss/OneDrive/Desktop/Sch/ProjC++/7.png");
+    if (!pixmap2.isNull()) {
+        ui->label_7->setPixmap(pixmap2.scaled(ui->label_7->size(), Qt::KeepAspectRatio));
+    }
+    this->setWindowTitle("Gestion des Boutiques");
+
+    // Charger les données au démarrage
+    Boutique b;
+    QSqlQueryModel *modelb = b.afficher();
+    fillTableFromModel(modelb);
 
     // ---------- EVENEMENT TABLE SETUP ----------
     evenement e;
@@ -532,7 +626,6 @@ void MainWindow::on_lineEdit_search_3_textChanged(const QString &text)
 #include <QSqlQuery>
 #include <QFile>
 #include <QTextStream>
-#include <QMessageBox>
 #include <QDebug>
 #include <QDateTime>
 #include <QMap>
@@ -541,7 +634,6 @@ void MainWindow::on_lineEdit_search_3_textChanged(const QString &text)
 #include <QSqlQuery>
 #include <QFile>
 #include <QTextStream>
-#include <QMessageBox>
 #include <QDebug>
 #include <QDateTime>
 #include <QMap>
@@ -665,7 +757,7 @@ void MainWindow::onComboBox2IndexChanged(int index)
 void MainWindow::checkUpcomingEvents()
 {
     QSqlQuery query;
-    query.prepare("SELECT * FROM IMENE.EVENEMENTS WHERE DATE_DEBUT >= :currentDate AND DATE_DEBUT <= :twoDaysLater");
+    query.prepare("SELECT * FROM EVENEMENTS WHERE DATE_DEBUT >= :currentDate AND DATE_DEBUT <= :twoDaysLater");
 
     QDate currentDate = QDate::currentDate();
     QDate twoDaysLater = currentDate.addDays(2);
@@ -750,7 +842,7 @@ void MainWindow::showNotification(const QString &message)
 
 void MainWindow::afficherRessources()
 {
-    QSqlQuery query("SELECT IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM IMENE.RESSOURCES");
+    QSqlQuery query("SELECT IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM ressources");
 
     ui->tableWidget_3->setColumnCount(9);
     ui->tableWidget_3->setHorizontalHeaderLabels({"ID", "Nom", "Type", "État", "Quantité", "Prix", "Localisation", "Date Achat", "Date Maintenance"});
@@ -811,7 +903,7 @@ void MainWindow::ajouterRessource()
     // Préparation de la requête SQL d'insertion
     QSqlQuery query;
     query.prepare(R"(
-        INSERT INTO IMENE.RESSOURCES (IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM)
+        INSERT INTO ressources (IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM)
         VALUES (RESSOURCES_SEQ.NEXTVAL, :nom, :type, :etat, :quantite, :prix, :localisation,
                 TO_DATE(:dateAchat, 'DD-MM-YYYY'), TO_DATE(:dateMaintenance, 'DD-MM-YYYY'))
     )");
@@ -903,7 +995,7 @@ void MainWindow::modifierRessource()
     // Mise à jour
     QSqlQuery query;
     query.prepare(R"(
-        UPDATE IMENE.RESSOURCES
+        UPDATE ressources
         SET NOMR=:nom, TYPER=:type, ETATR=:etat, QUANTITER=:quantite, PRIXR=:prix, LOCR=:localisation,
             DAR=TO_DATE(:dateAchat, 'DD-MM-YYYY'), DM=TO_DATE(:dateMaintenance, 'DD-MM-YYYY')
         WHERE IDR=:id
@@ -965,7 +1057,7 @@ void MainWindow::supprimerRessource()
 
     if (reply == QMessageBox::Yes) {
         QSqlQuery query;
-        query.prepare("DELETE FROM IMENE.RESSOURCES WHERE IDR = :id");
+        query.prepare("DELETE FROM ressources WHERE IDR = :id");
         query.bindValue(":id", id);
 
         if (query.exec()) {
@@ -1170,7 +1262,7 @@ void MainWindow::TrierParDisponibilite()
     }
 
     // 4. Requête SQL
-    QString queryStr = "SELECT IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM IMENE.RESSOURCES" + conditionEtat + tri;
+    QString queryStr = "SELECT IDR, NOMR, TYPER, ETATR, QUANTITER, PRIXR, LOCR, DAR, DM FROM ressources" + conditionEtat + tri;
     QSqlQuery query;
     query.prepare(queryStr);
     if (!etatFiltre.isEmpty()) query.bindValue(":etat", etatFiltre);
@@ -1257,7 +1349,7 @@ void MainWindow::afficherDatesMaintenance()
     format.setForeground(Qt::white);
     format.setFontWeight(QFont::Bold);
 
-    QSqlQuery query("SELECT DISTINCT DM FROM IMENE.RESSOURCES");
+    QSqlQuery query("SELECT DISTINCT DM FROM ressources");
 
     while (query.next()) {
         QDate date = query.value(0).toDate();
@@ -1269,7 +1361,7 @@ void MainWindow::afficherDatesMaintenance()
 void MainWindow::afficherRessourcesPourDate(const QDate &date)
 {
     QSqlQuery query;
-    query.prepare("SELECT NOMR, TYPER, LOCR FROM IMENE.RESSOURCES WHERE DM = TO_DATE(:date, 'YYYY-MM-DD')");
+    query.prepare("SELECT NOMR, TYPER, LOCR FROM ressources WHERE DM = TO_DATE(:date, 'YYYY-MM-DD')");
     query.bindValue(":date", date.toString("yyyy-MM-dd"));
 
     if (!query.exec()) {
@@ -1400,7 +1492,7 @@ void MainWindow::traiterSurtension(int id)
 
         // 1. On récupère le NOM de la ressource
         QSqlQuery getNameQuery;
-        getNameQuery.prepare("SELECT NOMR FROM IMENE.RESSOURCES WHERE IDR = :id");
+        getNameQuery.prepare("SELECT NOMR FROM ressources WHERE IDR = :id");
         getNameQuery.bindValue(":id", id);
 
         QString nomRessource = "Inconnu";
@@ -1420,3 +1512,1110 @@ void MainWindow::traiterSurtension(int id)
         qDebug() << "❌ Erreur de mise à jour : " << query.lastError().text();
     }
 }
+
+
+
+
+//////////////////////////////// BOUTIQUES ////////////////////////////////
+
+
+
+
+
+/*MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    connect(ui->localisation, &QPushButton::clicked, this, &MainWindow::afficherCarteInteractive);
+    QPixmap pixmap2("C:/Users/youss/OneDrive/Desktop/Sch/ProjC++/7.png");
+    if (!pixmap2.isNull()) {
+        ui->label_6->setPixmap(pixmap2.scaled(ui->label_6->size(), Qt::KeepAspectRatio));
+    }
+    this->setWindowTitle("Gestion des Boutiques");
+
+    // Charger les données au démarrage
+    Boutique b;
+    QSqlQueryModel *model = b.afficher();
+    fillTableFromModel(model);
+
+
+    arduino = new QSerialPort(this);
+    arduino->setPortName("COM3"); // ⚠️ adapte au vrai port
+    arduino->setBaudRate(QSerialPort::Baud9600);
+    arduino->setDataBits(QSerialPort::Data8);
+    arduino->setParity(QSerialPort::NoParity);
+    arduino->setStopBits(QSerialPort::OneStop);
+    arduino->setFlowControl(QSerialPort::NoFlowControl);
+
+    if (arduino->open(QIODevice::ReadWrite)) {
+        connect(arduino, &QSerialPort::readyRead, this, &MainWindow::readFromArduino);
+    } else {
+        ui->label->setText("Échec de connexion Arduino");
+    }
+
+
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}*/
+
+void MainWindow::fillTableFromModel(QSqlQueryModel *model)
+{
+    ui->tableWidget->setRowCount(model->rowCount());
+    ui->tableWidget->setColumnCount(model->columnCount());
+
+    for (int c = 0; c < model->columnCount(); ++c) {
+        ui->tableWidget->setHorizontalHeaderItem(c, new QTableWidgetItem(model->headerData(c, Qt::Horizontal).toString()));
+    }
+
+    for (int r = 0; r < model->rowCount(); ++r) {
+        for (int c = 0; c < model->columnCount(); ++c) {
+            ui->tableWidget->setItem(r, c, new QTableWidgetItem(model->data(model->index(r, c)).toString()));
+        }
+    }
+}
+
+/* ------------------------------------------------------
+   🔹 Ajouter une boutique (Sans entrer ID_B car auto-incrémenté)
+   ------------------------------------------------------ */
+void MainWindow::on_ajouter_clicked()
+{
+    // 🔹 Retrieve input values
+    QString nom          = ui->lineEdit->text().trimmed();
+    QString contact      = ui->lineEdit_3->text().trimmed();
+    QString statut       = ui->lineEdit_4->text().trimmed();
+    QString localisation = ui->lineEdit_5->text().trimmed();
+    QString categorie    = ui->lineEdit_6->text().trimmed();
+
+    // 🔹 Validate if fields are empty
+    if (nom.isEmpty() || contact.isEmpty() || statut.isEmpty() || localisation.isEmpty() || categorie.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Tous les champs doivent être remplis !");
+        return;
+    }
+
+    // 🔹 Validate name (only letters, 3-30 characters)
+    QRegularExpression nameRegex("^[A-Za-zÀ-ÖØ-öø-ÿ ]{3,30}$");
+    if (!nameRegex.match(nom).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le nom doit contenir uniquement des lettres (3-30 caractères) !");
+        return;
+    }
+
+    // 🔹 Validate contact (only numbers, 8-15 digits)
+    QRegularExpression phoneRegex("^[0-9]{8,15}$");
+    if (!phoneRegex.match(contact).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le contact doit être un numéro valide (8-15 chiffres) !");
+        return;
+    }
+
+    // 🔹 Validate statut (must be "actif" or "inactif")
+    if (statut.toLower() != "actif" && statut.toLower() != "inactif") {
+        QMessageBox::warning(this, "Erreur", "Le statut doit être 'actif' ou 'inactif' !");
+        return;
+    }
+
+    // 🔹 Validate localisation (3-50 characters)
+    if (localisation.length() < 3 || localisation.length() > 50) {
+        QMessageBox::warning(this, "Erreur", "La localisation doit contenir entre 3 et 50 caractères !");
+        return;
+    }
+
+    // 🔹 Validate catégorie (3-20 characters)
+    if (categorie.length() < 3 || categorie.length() > 20) {
+        QMessageBox::warning(this, "Erreur", "La catégorie doit contenir entre 3 et 20 caractères !");
+        return;
+    }
+
+    // ✅ If all validations pass, create and insert boutique
+    Boutique b(nom, statut, localisation, contact, categorie);
+    if (b.ajouter()) {
+        QMessageBox::information(this, "Succès", "Boutique ajoutée avec succès !");
+
+        // 🔄 Clear input fields after successful insertion
+        ui->lineEdit->clear();
+        ui->lineEdit_3->clear();
+        ui->lineEdit_4->clear();
+        ui->lineEdit_5->clear();
+        ui->lineEdit_6->clear();
+
+        // 🔄 Refresh table
+        QSqlQueryModel *model = b.afficher();
+        fillTableFromModel(model);
+    } else {
+        QMessageBox::warning(this, "Erreur", "Échec de l'ajout de la boutique !");
+    }
+}
+
+/* ------------------------------------------------------
+   🔹 Supprimer une boutique (Sélection depuis le tableau)
+   ------------------------------------------------------ */
+void MainWindow::on_supprimer_clicked()
+{
+    int selectedRow = ui->tableWidget->currentRow();
+
+    if (selectedRow == -1) {
+        QMessageBox::warning(this, "Erreur", "Veuillez sélectionner une boutique à supprimer.");
+        return;
+    }
+
+    QString idToDelete = ui->tableWidget->item(selectedRow, 0)->text();
+
+    Boutique b;
+    if (b.supprimer(idToDelete)) {
+        QMessageBox::information(this, "Succès", "Boutique supprimée !");
+        QSqlQueryModel *model = b.afficher();
+        fillTableFromModel(model);
+    } else {
+        QMessageBox::warning(this, "Erreur", "L'ID n'existe pas ou suppression échouée.");
+    }
+}
+
+/* ------------------------------------------------------
+   🔹 Modifier une boutique (Sélection depuis le tableau)
+   ------------------------------------------------------ */
+void MainWindow::on_modifier_clicked()
+{
+    // Vérifier si une ligne est sélectionnée
+    int selectedRow = ui->tableWidget->currentRow();
+    if (selectedRow == -1) {
+        QMessageBox::warning(this, "Erreur", "Veuillez sélectionner une boutique à modifier !");
+        return;
+    }
+
+    // Récupération de l'ID de la boutique sélectionnée
+    QString id = ui->tableWidget->item(selectedRow, 0)->text();
+
+    // Récupérer les anciennes valeurs (si l'utilisateur ne les modifie pas)
+    QString oldNom = ui->tableWidget->item(selectedRow, 1)->text();
+    QString oldStatut = ui->tableWidget->item(selectedRow, 2)->text();
+    QString oldLocalisation = ui->tableWidget->item(selectedRow, 3)->text();
+    QString oldContact = ui->tableWidget->item(selectedRow, 4)->text();
+    QString oldCategorie = ui->tableWidget->item(selectedRow, 5)->text();
+
+    // Récupérer les nouvelles valeurs (si l'utilisateur a modifié un champ)
+    QString nom = ui->lineEdit->text().trimmed().isEmpty() ? oldNom : ui->lineEdit->text().trimmed();
+    QString contact = ui->lineEdit_3->text().trimmed().isEmpty() ? oldContact : ui->lineEdit_3->text().trimmed();
+    QString statut = ui->lineEdit_4->text().trimmed().isEmpty() ? oldStatut : ui->lineEdit_4->text().trimmed();
+    QString localisation = ui->lineEdit_5->text().trimmed().isEmpty() ? oldLocalisation : ui->lineEdit_5->text().trimmed();
+    QString categorie = ui->lineEdit_6->text().trimmed().isEmpty() ? oldCategorie : ui->lineEdit_6->text().trimmed();
+
+    // **Contrôle de saisie**
+    QRegularExpression nameRegex("^[A-Za-zÀ-ÖØ-öø-ÿ ]{3,50}$"); // Nom: lettres et espaces uniquement
+    QRegularExpression phoneRegex("^[0-9]{8,15}$"); // Contact: uniquement des chiffres (8-15 chiffres)
+
+    if (!nameRegex.match(nom).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le nom doit contenir uniquement des lettres et au moins 3 caractères.");
+        return;
+    }
+
+    if (!phoneRegex.match(contact).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le contact doit être un numéro valide (8-15 chiffres).");
+        return;
+    }
+
+    if (statut.isEmpty() || localisation.isEmpty() || categorie.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez remplir tous les champs correctement !");
+        return;
+    }
+
+    // Créer l'objet avec les valeurs mises à jour
+    Boutique b(nom, statut, localisation, contact, categorie);
+
+    // Exécuter la mise à jour dans la base de données
+    if (!b.modifier(id)) {
+        QMessageBox::warning(this, "Erreur", "L'ID n'existe pas ou modification échouée.");
+        return;
+    }
+
+    QMessageBox::information(this, "Succès", "Boutique modifiée avec succès !");
+
+    // Rafraîchir la table
+    QSqlQueryModel *model = b.afficher();
+    fillTableFromModel(model);
+
+    // Effacer les champs après modification
+    ui->lineEdit->clear();
+    ui->lineEdit_3->clear();
+    ui->lineEdit_4->clear();
+    ui->lineEdit_5->clear();
+    ui->lineEdit_6->clear();
+}
+void MainWindow::on_tri_clicked()
+{
+    QString triValue = ui->comboBox->currentText().trimmed().toLower();
+    QSqlQueryModel *model = new QSqlQueryModel();
+    QSqlQuery query;
+
+    if (triValue == "tous") {
+        query.prepare("SELECT * FROM BOUTIQUE ORDER BY STATUT_B DESC, NOM_B ASC");
+    }
+    else if (triValue == "actif") {
+        query.prepare("SELECT * FROM BOUTIQUE ORDER BY CASE WHEN STATUT_B = 'actif' THEN 0 ELSE 1 END, NOM_B ASC");
+    }
+    else if (triValue == "inactif") {
+        query.prepare("SELECT * FROM BOUTIQUE ORDER BY CASE WHEN STATUT_B = 'inactif' THEN 0 ELSE 1 END, NOM_B ASC");
+    }
+    else {
+        query.prepare("SELECT * FROM BOUTIQUE WHERE LOWER(STATUT_B) = :val ORDER BY NOM_B ASC");
+        query.bindValue(":val", triValue);
+    }
+
+    query.exec();
+    model->setQuery(query);
+    fillTableFromModel(model);
+}
+
+void MainWindow::on_chercher_clicked()
+{
+    QString search = ui->lineEdit_7->text().trimmed();
+    QSqlQueryModel *model = new QSqlQueryModel();
+    QSqlQuery query;
+    query.prepare("SELECT * FROM BOUTIQUE WHERE LOWER(NOM_B) LIKE :val OR LOWER(CONTACT) LIKE :val OR LOWER(STATUT_B) LIKE :val OR LOWER(LOCALISATION) LIKE :val OR LOWER(CATEGORIE) LIKE :val");
+    query.bindValue(":val", "%" + search.toLower() + "%");
+    query.exec();
+    model->setQuery(query);
+    fillTableFromModel(model);
+}
+void MainWindow::on_pdf_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Enregistrer le PDF", "", "Fichiers PDF (*.pdf)");
+    if (fileName.isEmpty())
+        return;
+
+    QPdfWriter writer(fileName);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setResolution(300);
+
+    QPainter painter;
+    if (!painter.begin(&writer)) {
+        QMessageBox::warning(this, "Erreur", "Impossible de créer le fichier PDF.");
+        return;
+    }
+
+    // 🟤 Fond beige clair
+    painter.fillRect(QRectF(0, 0, writer.width(), writer.height()), QColor("#f5ede0"));
+
+    // 🔵 Titre avec fond bleu
+    QFont titleFont("Arial", 26, QFont::Bold);
+    painter.setFont(titleFont);
+    int titleWidth = 1200;
+    int titleHeight = 100;
+    int titleX = (writer.width() - titleWidth) / 2;
+    QRect titleRect(titleX, 40, titleWidth, titleHeight);
+
+    painter.setBrush(QColor("#2f466c"));
+    painter.setPen(Qt::NoPen);
+    painter.drawRoundedRect(titleRect, 15, 15);
+    painter.setPen(Qt::white);
+    painter.drawText(titleRect, Qt::AlignCenter, "🗂️ Liste des Boutiques");
+
+    // 🟦 Paramètres du tableau
+    int tableTotalWidth = 1600;
+    int startX = (writer.width() - tableTotalWidth) / 2;
+    int startY = 180;
+    int rowHeight = 80; // Increased row height
+    // Original column widths maintained
+    int columnWidths[] = {120, 300, 180, 300, 250, 300};
+
+    // En-têtes - EXACTLY AS IN YOUR ORIGINAL CODE
+    QFont headerFont("Arial", 11, QFont::Bold);
+    painter.setFont(headerFont);
+    painter.setPen(Qt::white);
+    QStringList headers = {"ID", "Nom", "Statut", "Localisation", "Contact", "Catégorie"};
+
+    // Dessiner les en-têtes - NO CHANGES TO HEADERS
+    int currentX = startX;
+    for (int i = 0; i < headers.size(); ++i) {
+        QRect rect(currentX, startY, columnWidths[i], rowHeight);
+        painter.setBrush(QColor("#2f466c"));
+        painter.setPen(Qt::NoPen);
+        painter.drawRect(rect);
+        painter.setPen(Qt::white);
+        painter.drawText(rect, Qt::AlignCenter, headers[i]);
+        currentX += columnWidths[i];
+    }
+
+    // 📄 Données - ONLY IMPROVED SPACING FOR CONTENT
+    QFont contentFont("Arial", 10);
+    painter.setFont(contentFont);
+
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
+        currentX = startX;
+        for (int col = 0; col < ui->tableWidget->columnCount(); ++col) {
+            QTableWidgetItem *item = ui->tableWidget->item(row, col);
+            QString text = item ? item->text() : "";
+
+            QRect rect(currentX, startY + (row + 1) * rowHeight, columnWidths[col], rowHeight);
+
+            // Couleurs alternées pour les lignes
+            painter.setBrush(row % 2 ? QColor("#ffffff") : QColor("#f0f0f0"));
+            painter.setPen(QColor("#d0d0d0"));
+            painter.drawRect(rect);
+
+            // Improved text spacing - ONLY CHANGE WAS HERE
+            painter.setPen(Qt::black);
+            QRect textRect = rect.adjusted(10, 10, -10, -10); // More padding
+            QTextOption option;
+            option.setAlignment(Qt::AlignCenter);
+            option.setWrapMode(QTextOption::WordWrap);
+            painter.drawText(textRect, text, option);
+
+            currentX += columnWidths[col];
+        }
+    }
+
+    // Ajouter un pied de page avec la date
+    QString date = QDate::currentDate().toString("dd/MM/yyyy");
+    QRect footerRect(0, writer.height() - 50, writer.width(), 30);
+    painter.setFont(QFont("Arial", 10));
+    painter.setPen(Qt::black);
+    painter.drawText(footerRect, Qt::AlignRight | Qt::AlignVCenter, "Généré le " + date);
+
+    painter.end();
+    QMessageBox::information(this, "PDF", "PDF généré avec succès !");
+}
+void MainWindow::on_statistique_clicked()
+{
+    statistique stats;
+    stats.exec();
+}
+void MainWindow::on_lire_clicked()
+{
+    int row = ui->tableWidget->currentRow();
+    if (row == -1) {
+        QMessageBox::information(this, "Information", "Veuillez sélectionner une boutique à lire.");
+        return;
+    }
+
+    QString nom = ui->tableWidget->item(row, 1)->text();
+    QString statut = ui->tableWidget->item(row, 2)->text();
+    QString localisation = ui->tableWidget->item(row, 3)->text();
+    QString contact = ui->tableWidget->item(row, 4)->text();
+    QString categorie = ui->tableWidget->item(row, 5)->text();
+
+    QString texte = "Nom de la boutique : " + nom +
+                    ". Statut : " + statut +
+                    ". Localisation : " + localisation +
+                    ". Contact : " + contact +
+                    ". Catégorie : " + categorie + ".";
+
+    // Créer un objet speech
+    QTextToSpeech *speech = new QTextToSpeech(this);
+
+    // Liste des locales disponibles par cet objet
+    QList<QLocale> locales = speech->availableLocales();
+    QStringList langues;
+    for (const QLocale &locale : locales) {
+        langues << QLocale::languageToString(locale.language());
+    }
+
+    bool ok;
+    QString selectedLang = QInputDialog::getItem(this, "Choix de la langue", "Langue :", langues, 0, false, &ok);
+    if (!ok || selectedLang.isEmpty()) return;
+
+    // Trouver la locale choisie
+    for (const QLocale &locale : locales) {
+        if (QLocale::languageToString(locale.language()) == selectedLang) {
+            speech->setLocale(locale);
+            break;
+        }
+    }
+
+    // Parler
+    speech->say(texte);
+}
+
+
+
+void MainWindow::afficherCarteInteractive()
+{
+    QDialog *carteDialog = new QDialog(this);
+    carteDialog->setWindowTitle("🗺️ Carte Interactive");
+    carteDialog->resize(1000, 600);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(carteDialog);
+
+    // 🗣️ Synthèse vocale
+    QTextToSpeech *speech = new QTextToSpeech(carteDialog);
+    speech->say("Bienvenue dans la carte interactive du centre commercial.");
+
+    // 🔎 Champ de recherche
+    QLineEdit *recherche = new QLineEdit();
+    recherche->setPlaceholderText("Rechercher une boutique...");
+    mainLayout->addWidget(recherche);
+
+    // 🧱 Grille des étages
+    QGridLayout *etageLayout = new QGridLayout();
+
+    QMap<QString, QLabel*> marqueurs; // 📍 Un marqueur par étage
+    QMap<QString, QWidget*> etageWidgets; // Widgets des étages
+    QStringList nomsEtages = {"1er Étage", "2ème Étage", "3ème Étage", "4ème Étage"};
+    QStringList couleurs = {"#e3f2fd", "#e8f5e9", "#ffebee", "#ede7f6"};
+
+    // Création des widgets d'étage
+    for (int i = 0; i < nomsEtages.size(); ++i) {
+        QWidget *etageWidget = new QWidget();
+        QVBoxLayout *layout = new QVBoxLayout(etageWidget);
+        QLabel *titre = new QLabel("<b>" + nomsEtages[i] + "</b>");
+        titre->setAlignment(Qt::AlignCenter);
+
+        QLabel *marker = new QLabel("📍");
+        marker->setAlignment(Qt::AlignCenter);
+        marker->setStyleSheet("font-size: 24px;");
+        marker->hide();
+
+        layout->addWidget(titre);
+        layout->addStretch();
+        layout->addWidget(marker);
+        etageWidget->setStyleSheet(QString("background-color: %1; border-radius: 10px; padding: 10px;").arg(couleurs[i]));
+
+        marqueurs[nomsEtages[i]] = marker;
+        etageWidgets[nomsEtages[i]] = etageWidget;
+        etageLayout->addWidget(etageWidget, 0, i);
+    }
+
+    mainLayout->addLayout(etageLayout);
+
+    // 📌 Emplacement des boutiques (clé = nom boutique en minuscules)
+    QMap<QString, QString> boutiques;
+    boutiques.insert("bershka", "1er Étage");
+    boutiques.insert("chnafer", "2ème Étage");
+    boutiques.insert("pullandbear", "2ème Étage");
+    boutiques.insert("zara", "2ème Étage");
+    boutiques.insert("majesty mud", "3ème Étage");
+    boutiques.insert("point m", "3ème Étage");
+    boutiques.insert("barsha", "3ème Étage");
+    boutiques.insert("kiabi", "3ème Étage");
+    boutiques.insert("koton", "4ème Étage");
+    boutiques.insert("fatale", "4ème Étage");
+    boutiques.insert("adidas", "3ème Étage");
+    boutiques.insert("dior", "3ème Étage");
+    boutiques.insert("celio", "1er Étage");
+
+
+
+
+
+    // 🎯 Recherche
+    connect(recherche, &QLineEdit::textChanged, this, [=](const QString &text){
+        QString lowerInput = text.trimmed().toLower();
+
+        // Cacher tous les marqueurs
+        for (auto marker : marqueurs) {
+            marker->hide();
+        }
+
+        // Réinitialiser les styles des étages
+        for (auto etage : etageWidgets) {
+            etage->setStyleSheet(etage->styleSheet().replace(QRegularExpression("border: [^;]+;"), ""));
+        }
+
+        // Recherche exacte, insensible à la casse
+        QMap<QString, QString>::const_iterator it = boutiques.constBegin();
+        while (it != boutiques.constEnd()) {
+            if (it.key().toLower() == lowerInput) {
+                QString etage = it.value();
+
+                // Montrer le marqueur
+                marqueurs[etage]->show();
+
+                // Ajouter un effet ping (bordure jaune)
+                etageWidgets[etage]->setStyleSheet(
+                    etageWidgets[etage]->styleSheet() +
+                    "border: 3px solid yellow; animation: ping 1s;"
+                    );
+
+                // Annonce vocale
+                speech->say("La boutique " + it.key() + " se trouve au " + etage);
+
+                // Ajouter l'animation CSS
+                carteDialog->setStyleSheet(
+                    "@keyframes ping {"
+                    "  0% { transform: scale(1); opacity: 1; }"
+                    "  50% { transform: scale(1.05); opacity: 0.8; }"
+                    "  100% { transform: scale(1); opacity: 1; }"
+                    "}"
+                    );
+                break;
+            }
+            ++it;
+        }
+    });
+
+    // 🔙 Bouton retour
+    QPushButton *retour = new QPushButton("Retour");
+    retour->setStyleSheet("background-color: #e91e63; color: white; padding: 6px 16px; border-radius: 5px;");
+    connect(retour, &QPushButton::clicked, carteDialog, &QDialog::accept);
+    mainLayout->addWidget(retour, 0, Qt::AlignRight);
+
+    carteDialog->exec();
+}
+
+
+
+
+
+
+
+
+
+
+/////////////////LOCATAIRES//////////////////////////////
+
+
+
+
+
+
+
+
+void MainWindow::fillTableFromModell(QSqlQueryModel *modell)
+{
+    ui->tableWidget_2->setRowCount(modell->rowCount());
+    ui->tableWidget_2->setColumnCount(modell->columnCount());
+
+    for (int c = 0; c < modell->columnCount(); ++c) {
+        ui->tableWidget_2->setHorizontalHeaderItem(c, new QTableWidgetItem(modell->headerData(c, Qt::Horizontal).toString()));
+    }
+
+    for (int r = 0; r < modell->rowCount(); ++r) {
+        for (int c = 0; c < modell->columnCount(); ++c) {
+            ui->tableWidget_2->setItem(r, c, new QTableWidgetItem(modell->data(modell->index(r, c)).toString()));
+        }
+    }
+}
+
+
+
+void MainWindow::on_ajtr_clicked()
+{
+    QString nom_loc = ui->nom->text();
+    QString mail_loc = ui->mail->text();
+    QDate date_inscrit = ui->dins->date();
+    QDate date_fc = ui->dfc->date();
+    QString statut = ui->st->currentText();
+    QString mode_p = ui->mp->currentText();
+    QString prix = ui->px->text();
+    QString num_loc = ui->nb->text();
+
+
+    //Validate if fields are empty
+    if (nom_loc.isEmpty() || mail_loc.isEmpty() || prix.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Tous les champs doivent être remplis !");
+        return;
+    }
+
+    //Validate name
+    QRegularExpression nameRegex("^[A-Za-zÀ-ÖØ-öø-ÿ ]{3,30}$");
+    if (!nameRegex.match(nom_loc).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le nom doit contenir uniquement des lettres (3-30 caractères) !");
+        return;
+    }
+
+    // Validate email (simple structure of user@domain.com)
+    QRegularExpression mailRegex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+
+    if (!mailRegex.match(mail_loc).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "L'email doit être valide.");
+        return;
+    }
+
+
+
+    //vald prix
+    if (prix.length() < 0) {
+        QMessageBox::warning(this, "Erreur", "prix doit etre valide !");
+        return;
+    }
+
+    //vald numero
+    if (num_loc.length() < 0) {
+        QMessageBox::warning(this, "Erreur", "numero doit etre valide !");
+        return;
+    }
+
+
+    // create locataire object without setting ID
+    locataires L(0, nom_loc, mail_loc, date_inscrit, date_fc, statut, mode_p, prix, num_loc);
+
+    bool test = L.aj();
+    if (test)
+    {
+        locataires l;
+        QSqlQueryModel *modell = l.aff();
+        fillTableFromModell(modell);
+        QMessageBox::information(nullptr, QObject::tr("OK"),
+                                 QObject::tr("Ajout effectué.\n"
+                                             "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+    }
+    else
+    {
+        QMessageBox::critical(nullptr, QObject::tr("Erreur"),
+                              QObject::tr("Ajout non effectué.\n"
+                                          "Cliquez sur Annuler pour quitter."), QMessageBox::Cancel);
+    }
+
+
+    //Clear inputs
+    ui->nom->clear();
+    ui->mail->clear();
+    ui->px->clear();
+    ui->nb->clear();
+
+}
+
+void MainWindow::on_dlt_clicked()
+{
+    int selectedRow = ui->tableWidget_2->currentRow();
+
+    if (selectedRow == -1) {
+        QMessageBox::warning(this, "Erreur", "Veuillez sélectionner un locataire à supprimer.");
+        return;
+    }
+
+    QString idToDelete = ui->tableWidget_2->item(selectedRow, 0)->text();
+
+    locataires l;
+    if (l.supp(idToDelete.toInt())) {
+
+        QMessageBox::information(this, "Succès", "locataire supprimée !");
+        QSqlQueryModel *modell = l.aff();
+        fillTableFromModell(modell);
+    } else {
+        QMessageBox::warning(this, "Erreur", "L'ID n'existe pas ou suppression échouée.");
+    }
+}
+
+
+void MainWindow::on_mdf_clicked()
+{
+    int selectedRow = ui->tableWidget_2->currentRow();
+    if (selectedRow == -1) {
+        QMessageBox::warning(this, "Erreur", "Veuillez sélectionner un locataire à modifier !");
+        return;
+    }
+
+    QString id = ui->tableWidget_2->item(selectedRow, 0)->text();
+    QString oldNom = ui->tableWidget_2->item(selectedRow, 1)->text();
+    QString oldMail = ui->tableWidget_2->item(selectedRow, 2)->text();
+    QDate oldDins = QDate::fromString(ui->tableWidget_2->item(selectedRow, 3)->text(), "yyyy-MM-dd");
+    QDate oldDfc = QDate::fromString(ui->tableWidget_2->item(selectedRow, 4)->text(), "yyyy-MM-dd");
+    QString oldStatut = ui->tableWidget_2->item(selectedRow, 5)->text();
+    QString oldModeP = ui->tableWidget_2->item(selectedRow, 6)->text();
+    QString oldPrix = ui->tableWidget_2->item(selectedRow, 7)->text();
+    QString oldNum = ui->tableWidget_2->item(selectedRow, 8)->text();
+
+    QString nom = ui->nom->text().trimmed().isEmpty() ? oldNom : ui->nom->text().trimmed();
+    QString mail = ui->mail->text().trimmed().isEmpty() ? oldMail : ui->mail->text().trimmed();
+    QDate dins = ui->dins->date().isValid() ? ui->dins->date() : oldDins;
+    QDate dfc = ui->dfc->date().isValid() ? ui->dfc->date() : oldDfc;
+    QString statut = ui->st->currentText().trimmed().isEmpty() ? oldStatut : ui->st->currentText().trimmed();
+    QString modeP = ui->mp->currentText().trimmed().isEmpty() ? oldModeP : ui->mp->currentText().trimmed();
+    QString prix = ui->px->text().trimmed().isEmpty() ? oldPrix : ui->px->text().trimmed();
+    QString num_loc = ui->nb->text().trimmed().isEmpty() ? oldNum : ui->nb->text().trimmed();
+
+    QRegularExpression nameRegex("^[A-Za-zÀ-ÖØ-öø-ÿ ]{3,50}$");
+    QRegularExpression emailRegex("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$");
+    QRegularExpression priceRegex("^[0-9]+(\\.[0-9]{1,2})?$");
+
+    if (!nameRegex.match(nom).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le nom doit contenir uniquement des lettres et au moins 3 caractères.");
+        return;
+    }
+
+    if (!emailRegex.match(mail).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "L'adresse mail doit être valide.");
+        return;
+    }
+
+    if (!priceRegex.match(prix).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le prix doit être un nombre valide.");
+        return;
+    }
+
+
+    // Correct constructor with 8 parameters
+    locataires l(id.toInt(), nom, mail, dins, dfc, statut, modeP, prix, num_loc);
+
+    // Update the locataire in the database
+    if (!l.modif(id.toInt())) {
+        QMessageBox::warning(this, "Erreur", "L'ID n'existe pas ou modification échouée.");
+        return;
+    }
+
+    QMessageBox::information(this, "Succès", "Le locataire a été modifié avec succès.");
+}
+
+
+
+
+void MainWindow::on_trr_clicked()
+{
+    ui->rch->clear();
+
+    QString triValue = ui->trc->currentText().trimmed().toLower();
+    QSqlQueryModel *modell = new QSqlQueryModel();
+    QSqlQuery query;
+
+    // Use CASE to prioritize rows that match the chosen statut
+    query.prepare(R"(
+        SELECT * FROM LOCATAIRES
+        ORDER BY
+            CASE
+                WHEN LOWER(STATUT) = :val THEN 0
+                ELSE 1
+            END,
+            NOM_LOC ASC
+    )");
+
+    query.bindValue(":val", triValue);
+    query.exec();
+
+    modell->setQuery(query);
+    fillTableFromModell(modell);
+}
+
+
+void MainWindow::on_rchb_clicked()
+{
+    QString searchValue = ui->rch->text().trimmed().toLower();
+    QSqlQueryModel *modell = new QSqlQueryModel();
+    QSqlQuery query;
+
+    // Filter rows that match the search (for example, name or email)
+    query.prepare(R"(
+        SELECT * FROM LOCATAIRES
+        WHERE LOWER(NOM_LOC) LIKE :val
+           OR LOWER(MAIL_LOC) LIKE :val
+           OR LOWER(STATUT) LIKE :val
+    )");
+
+    query.bindValue(":val", "%" + searchValue + "%");
+    query.exec();
+
+    modell->setQuery(query);
+    fillTableFromModell(modell);
+}
+
+
+
+void MainWindow::on_pdfl_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Enregistrer le PDF", "", "Fichiers PDF (*.pdf)");
+    if (fileName.isEmpty())
+        return;
+
+    QPdfWriter writer(fileName);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setResolution(300);
+
+    QPainter painter;
+    if (!painter.begin(&writer)) {
+        QMessageBox::warning(this, "Erreur", "Impossible de créer le fichier PDF.");
+        return;
+    }
+
+    // 🔹 Colors
+    QColor beige("#f5efe7");
+    QColor darkBlue("#213555");
+    QColor lightBlue("#3e5879");
+    QColor white(Qt::white);
+
+    // 🔹 Fill background
+    painter.fillRect(writer.pageLayout().fullRectPixels(writer.resolution()), beige);
+
+    int startX = 50;
+    int startY = 200;
+    int rowHeight = 80;
+    int columnWidth = 240;
+
+    // 🔹 Title
+    QFont titleFont("Arial", 18, QFont::Bold);
+    painter.setFont(titleFont);
+    painter.setPen(lightBlue);
+    painter.drawText(startX, startY - 60, "LOCATAIRES");
+
+    // 🔹 Headers
+    QFont headerFont("Arial", 11, QFont::Bold);
+    painter.setFont(headerFont);
+    painter.setPen(white);
+
+    QStringList headers = {"ID", "Nom", "Mail", "DI", "DFC", "Statut", "Mode", "Prix", "Numero"};
+
+    for (int i = 0; i < headers.size(); ++i) {
+        QRect rect(startX + i * columnWidth, startY, columnWidth, rowHeight);
+        painter.setBrush(darkBlue);
+        painter.setPen(Qt::NoPen);
+        painter.drawRoundedRect(rect, 10, 10); // Round corners
+        painter.setPen(white);
+        painter.drawText(rect, Qt::AlignCenter, headers[i]);
+    }
+
+    // 🔹 Content rows
+    QFont contentFont("Arial", 10);
+    painter.setFont(contentFont);
+    painter.setPen(Qt::black);
+
+    for (int row = 0; row < ui->tableWidget_2->rowCount(); ++row) {
+        for (int col = 0; col < ui->tableWidget_2->columnCount(); ++col) {
+            QTableWidgetItem *item = ui->tableWidget_2->item(row, col);
+            QString text = item ? item->text() : "";
+            QRect rect(startX + col * columnWidth, startY + (row + 1) * rowHeight, columnWidth, rowHeight);
+            painter.setBrush(Qt::NoBrush);
+            painter.setPen(Qt::black);
+            painter.drawRoundedRect(rect, 10, 10);
+            painter.drawText(rect, Qt::AlignLeft, text);
+        }
+    }
+
+    painter.end();
+    QMessageBox::information(this, "PDF", "PDF généré avec succès !");
+}
+
+
+
+
+
+
+
+
+void MainWindow::on_stts_clicked() {
+    locataires l;
+    QMap<QString, int> stats = l.stat_payement();
+
+    QPieSeries *series = new QPieSeries();
+
+    int total = 0;
+    for (auto val : stats.values()) {
+        total += val;
+    }
+
+    for (auto it = stats.begin(); it != stats.end(); ++it) {
+        qreal percentage = (total > 0) ? (100.0 * it.value() / total) : 0;
+        QPieSlice *slice = series->append(
+            it.key() + " - " + QString::number(percentage, 'f', 1) + "%",
+            it.value()
+            );
+        QObject::connect(slice, &QPieSlice::hovered, [=](bool state){
+            if (state) {
+                QToolTip::showText(QCursor::pos(), it.key() + ": " + QString::number(it.value()));
+            }
+        });
+
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Répartition des modes de paiement");
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Statistiques");
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+    layout->addWidget(chartView);
+    dialog->setLayout(layout);
+    dialog->resize(500, 400);
+    dialog->exec();
+}
+
+
+void MainWindow::on_mlng_clicked()
+{
+    QModelIndex currentIndex = ui->tableWidget_2->currentIndex();
+    if (!currentIndex.isValid()) {
+        QMessageBox::warning(this, "Erreur", "Veuillez sélectionner un locataire.");
+        return;
+    }
+
+    int row = currentIndex.row();
+    QString email = ui->tableWidget_2->model()->index(row, 2).data().toString(); // assuming email is column 2
+
+    QString subject = "Gestini Authentification";
+    QString body = "Bonjour, votre email a été authentifié. Vous êtes un locataire enregistré avec succès.";
+
+    if (Mailing::sendMail(email, subject, body)) {
+        QMessageBox::information(this, "Succès", "Email envoyé avec succès à " + email);
+    } else {
+        QMessageBox::critical(this, "Erreur", "Échec de l'envoi du mail.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+void MainWindow::sendSMS_Infobip(const QString& recipientPhone)
+{
+    QModelIndex index = ui->tableWidget_2->currentIndex();
+    if (!index.isValid()) {
+        QMessageBox::warning(this, "Erreur", "Sélectionnez un locataire.");
+        return;
+    }
+
+    int row = index.row();
+    QString apiKey = "d62834fec73a05bb23422d844e13d502-c80b8371-5231-4b12-9aff-f632630b0ec1";
+    QString baseUrl = "https://v3dpqv.api.infobip.com";
+    QString sender = "447491163443";
+    QString fullPhone = "+216" + recipientPhone;
+    QString statut = ui->tableWidget_2->model()->index(row, 5).data().toString(); // statut is col 5
+    QString messageText = "Bonjour cher locataire Gestini, votre statut est '" + statut + "'. Merci de régulariser votre paiement.";
+
+    QUrl url(baseUrl + "/sms/2/text/advanced");
+    QNetworkRequest request(url);
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Authorization", "App " + apiKey.toUtf8());
+
+    QJsonObject message;
+    message["from"] = sender;
+    message["destinations"] = QJsonArray{ QJsonObject{{"to", fullPhone}} };
+    message["text"] = messageText;
+
+    QJsonObject root;
+    root["messages"] = QJsonArray{ message };
+
+    QNetworkAccessManager* manager = new QNetworkAccessManager(this);
+    QNetworkReply* reply = manager->post(request, QJsonDocument(root).toJson());
+
+    connect(reply, &QNetworkReply::finished, this, [reply]() {
+        if (reply->error() == QNetworkReply::NoError) {
+            qDebug() << "SMS sent successfully!";
+            QMessageBox::information(nullptr, "Succès", "SMS envoyé avec succès !");
+        } else {
+            qDebug() << "SMS failed:" << reply->errorString();
+            QMessageBox::warning(nullptr, "Erreur", "Échec de l'envoi du SMS !");
+        }
+        reply->deleteLater();
+    });
+}
+
+
+
+void MainWindow::on_vn_clicked()
+{
+    QList<QTableWidgetItem *> selectedItems = ui->tableWidget_2->selectedItems();
+    if (selectedItems.isEmpty()) {
+        QMessageBox::warning(this, "Aucun locataire", "Veuillez sélectionner un locataire.");
+        return;
+    }
+
+    int row = selectedItems.first()->row();
+    QString phoneNumber = ui->tableWidget_2->item(row, /*phone number column*/8)->text(); // adjust column index if needed
+
+    if (phoneNumber.isEmpty()) {
+        QMessageBox::warning(this, "Erreur", "Le numéro est vide.");
+        return;
+    }
+
+    sendSMS_Infobip(phoneNumber);
+}
+///////////arduino/////////////
+
+
+
+
+
+/*void MainWindow::readFromArduino() {
+    arduinoData += arduino->readAll();
+
+    if (arduinoData.contains('\n')) {
+        QString cardID = arduinoData.trimmed();
+        arduinoData.clear();
+
+        if (checkRFIDInDatabase(cardID)) {
+            QMessageBox::information(this, "Access Granted", "Welcome");
+        } else {
+            qDebug() << "Sending 'buzz' command to Arduino";
+
+            arduino->write("buzz\n");
+            QMessageBox::warning(this, "Access Denied", "Card not recognized.");
+        }
+    }
+}*//*
+void MainWindow::readFromArduino() {
+    arduinoData += arduino->readAll();
+
+    // Ensure that there's something to process
+    if (arduinoData.contains('\n') && !arduinoData.isEmpty()) {
+        QString cardID = arduinoData.trimmed();
+        arduinoData.clear();
+
+        if (checkRFIDInDatabase(cardID)) {
+            QMessageBox::information(this, "Access Granted", "Welcome");
+        } else {
+            qDebug() << "Sending 'buzz' command to Arduino";
+
+            arduino->write("buzz\n");  // Send 'buzz' to Arduino
+            arduino->flush();  // Ensure data is sent immediately
+            QMessageBox::warning(this, "Access Denied", "Card not recognized.");
+        }
+    }
+}*/
+
+
+
+
+
+
+void MainWindow::readFromArduinol() {
+    arduinoData += arduino->readAll();
+
+    while (arduinoData.contains('\n')) {
+        int newlineIndex = arduinoData.indexOf('\n');
+        QString line = arduinoData.left(newlineIndex);
+        arduinoData.remove(0, newlineIndex + 1);
+
+        qDebug() << "Raw line from Arduino (before trim):" << line.toUtf8();
+        line = line.trimmed();
+        qDebug() << "Trimmed line:" << line.toUtf8();
+
+        if (line.isEmpty() || line == "NO_CARD" || line.startsWith("Received command:")) {
+            qDebug() << "Ignored line";
+            continue;
+        }
+
+        QString normalizedCardID = line.toUpper().remove(' ').remove('\r');
+        qDebug() << "Normalized card ID to check:" << normalizedCardID;
+
+        if (checkRFIDInDatabase(normalizedCardID)) {
+            qDebug() << "Card recognized!";
+            arduino->write("servo\n");
+            arduino->flush();
+            QMessageBox::information(this, "Access Granted", "Welcome");
+        } else {
+            qDebug() << "Card NOT recognized!";
+
+            arduino->write("buzz\n");
+            arduino->flush();
+            QMessageBox::warning(this, "Access Denied", "Card not recognized.");
+        }
+    }
+
+}
+
+bool MainWindow::checkRFIDInDatabase(const QString& cardID) {
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM LOCATAIRES WHERE CODE = :cardID");
+    query.bindValue(":cardID", cardID);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+    return false;
+}
+
+
+
+
+
+

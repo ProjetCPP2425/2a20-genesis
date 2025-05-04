@@ -30,7 +30,7 @@ Boutique::Boutique(QString nom, QString statut, QString localisation, QString co
 bool Boutique::ajouter()
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO BOUTIQUE (NOM_B, STATUT_B, LOCALISATION, CONTACT, CATEGORIE) "
+    query.prepare("INSERT INTO boutique (NOM_B, STATUT_B, LOCALISATION, CONTACT, CATEGORIE) "
                   "VALUES (:NOM_B, :STATUT_B, :LOCALISATION, :CONTACT, :CATEGORIE)");
 
     query.bindValue(":NOM_B", nom);

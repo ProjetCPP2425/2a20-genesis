@@ -37,7 +37,7 @@ evenement::evenement(QString nom, QDate date_debut, QDate date_fin, QString lieu
 
 bool evenement::ajouter() {
     QSqlQuery query;
-    query.prepare("INSERT INTO IMENE.EVENEMENTS (NOM, DATE_DEBUT, DATE_FIN, LIEU, CAPACITE, SPONSORS, BUDGET)"
+    query.prepare("INSERT INTO evenements (NOM, DATE_DEBUT, DATE_FIN, LIEU, CAPACITE, SPONSORS, BUDGET)"
                   "VALUES (:nom, :date_debut, :date_fin, :lieu, :capacite, :sponsors, :budget)");
 
     query.bindValue(":nom", nom);
@@ -70,7 +70,7 @@ bool evenement::modifier(QString old_nom) {
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE IMENE.EVENEMENTS SET NOM=:nom, DATE_DEBUT=:date_debut, DATE_FIN=:date_fin, "
+    query.prepare("UPDATE evenements SET NOM=:nom, DATE_DEBUT=:date_debut, DATE_FIN=:date_fin, "
                   "BUDGET=:budget, CAPACITE=:capacite, LIEU=:lieu, SPONSORS=:sponsors WHERE NOM=:old_nom");
 
     query.bindValue(":old_nom", old_nom);
@@ -98,7 +98,7 @@ bool evenement::modifier(QString old_nom) {
 
 QSqlQueryModel* evenement::afficher() {
     QSqlQueryModel *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM IMENE.EVENEMENTS");
+    model->setQuery("SELECT * FROM evenements");
 
     if (model->lastError().isValid()) {
         qDebug() << "Display query failed:" << model->lastError().text();
@@ -119,7 +119,7 @@ QSqlQueryModel* evenement::afficher() {
 
 bool evenement::supprimer(QString nom) {
     QSqlQuery query;
-    query.prepare("DELETE FROM IMENE.EVENEMENTS WHERE NOM = :nom");
+    query.prepare("DELETE FROM evenements WHERE NOM = :nom");
     query.bindValue(":nom", nom);
 
     bool success = query.exec();
@@ -143,7 +143,7 @@ void evenement::afficherStatistiques(QWidget *parent) {
     statsDialog->setMinimumSize(1250, 450);
 
     QSqlQuery locationQuery;
-    locationQuery.prepare("SELECT LIEU, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY LIEU");
+    locationQuery.prepare("SELECT LIEU, COUNT(*) FROM evenements GROUP BY LIEU");
 
     if (!locationQuery.exec()) {
         qDebug() << "Location statistics query failed:" << locationQuery.lastError().text();
@@ -160,7 +160,7 @@ void evenement::afficherStatistiques(QWidget *parent) {
         locationSeries->append(location, count);
     }
     QSqlQuery sponsorQuery;
-    sponsorQuery.prepare("SELECT SPONSORS, COUNT(*) FROM IMENE.EVENEMENTS GROUP BY SPONSORS");
+    sponsorQuery.prepare("SELECT SPONSORS, COUNT(*) FROM evenements GROUP BY SPONSORS");
 
     if (!sponsorQuery.exec()) {
         qDebug() << "Sponsor statistics query failed:" << sponsorQuery.lastError().text();
@@ -234,7 +234,7 @@ QSqlQueryModel* evenement::getPastEvents() {
     QSqlQueryModel *model = new QSqlQueryModel();
     QSqlQuery query;
 
-    query.prepare("SELECT * FROM IMENE.EVENEMENTS WHERE DATE_FIN < :currentDate");
+    query.prepare("SELECT * FROM evenements WHERE DATE_FIN < :currentDate");
     query.bindValue(":currentDate", QDate::currentDate());
 
     if (!query.exec()) {
@@ -250,7 +250,7 @@ QSqlQueryModel* evenement::getPastEvents() {
 
 QSqlQueryModel* evenement::trier(const QString& critere, const QString& ordre) {
     QSqlQueryModel* model = new QSqlQueryModel();
-    QString queryStr = "SELECT * FROM IMENE.evenements ORDER BY " + critere + " " + ordre;
+    QString queryStr = "SELECT * FROM evenements ORDER BY " + critere + " " + ordre;
     model->setQuery(queryStr);
 
     if (model->lastError().isValid()) {

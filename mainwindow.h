@@ -10,6 +10,11 @@
 #include <QPainter>
 #include <QFileDialog>
 
+#include <QSqlError>
+#include <QSqlQueryModel>
+#include "locataire.h"
+#include "qtexttospeech.h"
+#include "boutique.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -66,8 +71,33 @@ private slots:
 
     //void on_pushButton_testarduino_clicked();
 
-  //  void on_pushButton_arduinoff_clicked();
+    //void on_pushButton_arduinoff_clicked();
     //void update_label();
+
+    //////////////BOUTIQUES////////////
+    void on_ajouter_clicked();   // for the "ajouter" button
+    void on_supprimer_clicked(); // for the "supprimer" button
+    void on_modifier_clicked();  // only if you have a button named "modifier"
+    void on_lire_clicked();
+    void on_pdf_clicked();
+    void on_chercher_clicked();
+    void on_tri_clicked();
+    void on_statistique_clicked();
+    void afficherCarteInteractive();
+    /////////////LOCATAIRES////////////
+    void on_ajtr_clicked();
+    void on_dlt_clicked();
+    void on_mdf_clicked();
+    void on_trr_clicked();
+    void on_rchb_clicked();
+    void on_pdfl_clicked();
+    void on_stts_clicked();
+    void on_mlng_clicked();
+    void on_vn_clicked();
+    void sendSMS_Infobip(const QString& recipientPhone);
+    void readFromArduinol();
+    bool checkRFIDInDatabase(const QString& cardID);
+    void fillTableFromModell(QSqlQueryModel *modell);
 
 private:
     Ui::MainWindow *ui;
@@ -81,6 +111,11 @@ private:
      QString buffer;
 
      void traiterSurtension(int id);
-
+     QTextToSpeech *speech;
+     // Helper to fill the QTableWidget from a QSqlQueryModel
+     void fillTableFromModel(QSqlQueryModel *model);
+     QPixmap *pixmap;
+     locataires L;
+     QString arduinoData;
 };
 #endif // MAINWINDOW_H
