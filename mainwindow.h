@@ -99,6 +99,26 @@ private slots:
     bool checkRFIDInDatabase(const QString& cardID);
     void fillTableFromModell(QSqlQueryModel *modell);
 
+
+    void on_gesl_clicked();
+    void on_gesb_clicked();
+    void on_gesev_clicked();
+    void on_gesr_clicked();
+    void on_geslis_clicked();
+    void on_gesbis_clicked();
+    void on_gesevis_clicked();
+    void on_gesris_clicked();
+    void on_gesley_clicked();
+    void on_gesbey_clicked();
+    void on_gesevey_clicked();
+    void on_gesrey_clicked();
+    void on_geslim_clicked();
+    void on_gesbim_clicked();
+    void on_gesevim_clicked();
+    void on_gesrim_clicked();
+
+
+
 private:
     Ui::MainWindow *ui;
     evenement e;

@@ -2617,5 +2617,89 @@ bool MainWindow::checkRFIDInDatabase(const QString& cardID) {
 
 
 
+void MainWindow::on_gesl_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->locataires);
+}
+
+void MainWindow::on_gesb_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->boutique);
+}
+
+void MainWindow::on_gesev_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->evenement);
+}
+
+void MainWindow::on_gesr_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->ressources);
+}
+
+void MainWindow::on_geslis_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->locataires);
+}
+
+void MainWindow::on_gesbis_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->boutique);
+}
+
+void MainWindow::on_gesevis_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->evenement);
+}
+
+void MainWindow::on_gesris_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->ressources);
+}
+
+void MainWindow::on_gesley_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->locataires);
+}
+
+void MainWindow::on_gesbey_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->boutique);
+}
+
+void MainWindow::on_gesevey_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->evenement);
+}
+
+void MainWindow::on_gesrey_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->ressources);
+}
+
+void MainWindow::on_geslim_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->locataires);
+}
+
+void MainWindow::on_gesbim_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->boutique);
+}
+
+void MainWindow::on_gesevim_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->evenement);
+}
+
+void MainWindow::on_gesrim_clicked()
+{
+    ui->tabWidget->setCurrentWidget(ui->ressources);
+}
+
+
+
+
+
 
 

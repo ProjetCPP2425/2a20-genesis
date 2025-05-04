@@ -333,7 +333,7 @@ QLineEdit#searchBar:focus {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="evenement">
      <attribute name="title">
@@ -1556,7 +1556,7 @@ QLineEdit, QTextEdit, QPlainTextEdit {
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-style:normal; color:#00007f;&quot;&gt;Gestini&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_25">
+      <widget class="QPushButton" name="gesbim">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1624,7 +1624,7 @@ QPushButton:pressed {
         <string>Gestion  des evenements</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_27">
+      <widget class="QPushButton" name="geslim">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1658,7 +1658,7 @@ QPushButton:pressed {
         <string>Gestion  des locataires</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_28">
+      <widget class="QPushButton" name="gesrim">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1692,7 +1692,7 @@ QPushButton:pressed {
         <string>Gestion  des ressources</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_29">
+      <widget class="QPushButton" name="gesmim">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -2525,7 +2525,7 @@ QLineEdit#searchBar:focus {
       <property name="title">
        <string>Gestion Ressources</string>
       </property>
-      <widget class="QPushButton" name="pushButton_37">
+      <widget class="QPushButton" name="pushButton">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -2538,7 +2538,7 @@ QLineEdit#searchBar:focus {
         <string>Gestion Ressources</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_38">
+      <widget class="QPushButton" name="gesbey">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -2551,7 +2551,7 @@ QLineEdit#searchBar:focus {
         <string>Gestion Boutiques </string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_39">
+      <widget class="QPushButton" name="gesevey">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -2564,7 +2564,7 @@ QLineEdit#searchBar:focus {
         <string>Gestion évènement</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_40">
+      <widget class="QPushButton" name="gesley">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -2577,7 +2577,7 @@ QLineEdit#searchBar:focus {
         <string>Gestion locataires</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_41">
+      <widget class="QPushButton" name="gesmey">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -2969,7 +2969,7 @@ QLineEdit#searchBar:focus {
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="boutique">
      <attribute name="title">
       <string>Boutiques</string>
      </attribute>
@@ -3126,7 +3126,7 @@ QLineEdit#searchBar:focus {
       <property name="title">
        <string>GESTINI</string>
       </property>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="gesbis">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -3139,7 +3139,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION BOUTIQUES</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="gesris">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -3152,7 +3152,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION RESSOURCES</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_3">
+      <widget class="QPushButton" name="gesevis">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -3165,7 +3165,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION EVENEMENTS</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_4">
+      <widget class="QPushButton" name="geslis">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -3178,7 +3178,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION LOCATAIRES</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="gesmis">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -3415,7 +3415,7 @@ QLineEdit#searchBar:focus {
       </widget>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab_2">
+    <widget class="QWidget" name="locataires">
      <attribute name="title">
       <string>Locataires</string>
      </attribute>
@@ -3894,7 +3894,7 @@ QLineEdit#searchBar:focus {
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_7">
+      <widget class="QPushButton" name="gesb">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -3907,7 +3907,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION BOUTIQUES</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_8">
+      <widget class="QPushButton" name="gesr">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -3920,7 +3920,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION RESSOURCES</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_9">
+      <widget class="QPushButton" name="gesev">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -3946,7 +3946,7 @@ QLineEdit#searchBar:focus {
         <string>GESTION LOCATAIRES</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_11">
+      <widget class="QPushButton" name="gesm">
        <property name="geometry">
         <rect>
          <x>20</x>
