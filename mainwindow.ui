@@ -333,7 +333,7 @@ QLineEdit#searchBar:focus {
 }</string>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="evenement">
      <attribute name="title">
@@ -2528,9 +2528,9 @@ QLineEdit#searchBar:focus {
       <widget class="QPushButton" name="pushButton_37">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>20</x>
          <y>180</y>
-         <width>211</width>
+         <width>181</width>
          <height>41</height>
         </rect>
        </property>
@@ -2971,7 +2971,7 @@ QLineEdit#searchBar:focus {
     </widget>
     <widget class="QWidget" name="tab">
      <attribute name="title">
-      <string>Page</string>
+      <string>Boutiques</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_7">
       <property name="geometry">
@@ -3417,7 +3417,7 @@ QLineEdit#searchBar:focus {
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>Page</string>
+      <string>Locataires</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_10">
       <property name="geometry">
