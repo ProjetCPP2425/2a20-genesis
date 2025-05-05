@@ -6,6 +6,7 @@
 Arduino::Arduino(QObject *parent) : QObject(parent)
 {
     serial = new QSerialPort(this);
+
 }
 
 bool Arduino::connectArduino()

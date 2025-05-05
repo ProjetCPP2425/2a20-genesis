@@ -1,13 +1,12 @@
-#include "mainwindow.h"
+
+#include "login.h"
+#include "connection.h"
 #include <QApplication>
 #include <QMessageBox>
-#include "connection.h"
-#include <QDate>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
     Connection c;
     bool test = c.createConnection();
 
@@ -22,6 +21,11 @@ int main(int argc, char *argv[])
                               QObject::tr("Connection failed.\n"
                                           "Click Cancel to exit."), QMessageBox::Cancel);
     }
+
+
+
+    LOGIN loginWindow;
+    loginWindow.show();
 
     return a.exec();
 }

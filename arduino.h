@@ -14,6 +14,9 @@ public:
     QByteArray readFromArduino();
     void closeArduino();
 
+    //void readFromArduino();
+    bool checkRFIDInDatabase(const QString& cardID);
+
 private:
     class QSerialPort *serial;
 };

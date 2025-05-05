@@ -1,5 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#define LOGIN_H
+
 #include "evenements.h"
 #include <QMainWindow>
 #include <QStandardItemModel>
@@ -16,6 +18,19 @@
 #include "qtexttospeech.h"
 #include "boutique.h"
 
+#include <QMessageBox>
+#include <QDate>
+#include <QComboBox>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QTableWidget>
+#include <QRegularExpression>
+#include <QCryptographicHash>
+#include <QSqlQuery>
+#include <QtCharts>    // Modifié pour inclure tous les composants charts
+#include <QSqlRecord>
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -29,6 +44,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void refreshTable();
 
 private slots:
     void onRowSelected();
@@ -84,6 +100,7 @@ private slots:
     void on_tri_clicked();
     void on_statistique_clicked();
     void afficherCarteInteractive();
+
     /////////////LOCATAIRES////////////
     void on_ajtr_clicked();
     void on_dlt_clicked();
@@ -98,6 +115,30 @@ private slots:
     void readFromArduinol();
     bool checkRFIDInDatabase(const QString& cardID);
     void fillTableFromModell(QSqlQueryModel *modell);
+
+    /////////////EMPLOYES/////////////
+    void onTriClicked();
+    void onvaliderClicked();
+    void onvalClicked();
+    void ondelClicked();
+    void onupClicked();
+    void populateFields(int row);
+    void trierEmployes(const QString &critere);
+    void rechercherEmploye(const QString &criteres);
+    void onSearchClicked();
+    void searchEmployes(const QString &searchText);
+    void onpdfclicked();
+    void on_statbutton_clicked();
+    void onDashboardClicked();
+
+    void onPasswordForgotClicked();  // Bouton "Mot de passe oublié"
+    void onResetPasswordClicked();   // Validation de la réinitialisation
+    void onShowPasswordToggled(bool checked);
+
+    void onSerialDataReceived();
+
+    void onHistoriqueClicked();
+
 ////
 
     void on_gesl_clicked();
@@ -137,5 +178,22 @@ private:
      QPixmap *pixmap;
      locataires L;
      QString arduinoData;
+
+     //EMP
+     void refreshTableWithQuery(QSqlQuery &query);
+     void addPieChartToTab(QTabWidget *tabWidget, const QString &title, QPieSeries *series, const QStringList &colors);
+     void addBarChartToTab(QTabWidget *tabWidget, const QString &title, QBarSeries *series, const QStringList &colors);
+     int calculateEmployeesInRange(int minAge, int maxAge);
+
+     QVBoxLayout *verticalLayout;
+
+     void showPasswordResetDialog();
+     bool verifySecretAnswer(const QString &nom, const QString &question, const QString &reponse);
+     void updatePassword(const QString &nom, const QString &newPassword);
+     QStringList getSecretQuestions(); // Récupère toutes les questions disponibles
+     void enregistrerHistorique(const QString &utilisateur, const QString &action, const QString &cible);
+
+     void val();
+
 };
 #endif // MAINWINDOW_H

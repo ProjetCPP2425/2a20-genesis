@@ -8,6 +8,9 @@ QT       += core gui  serialport
 QT +=texttospeech quick quickwidgets quickcontrols2
 QT+=network
 
+QT += core gui widgets sql serialport charts printsupport
+DEFINES += QT_DEPRECATED_WARNINGS
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -20,11 +23,13 @@ SOURCES += \
     evenements.cpp \
     historydialog.cpp \
     locataire.cpp \
+    login.cpp \
     mailing.cpp \
     main.cpp \
     mainwindow.cpp \
     qrcode.cpp \
     qrcodegen.cpp \
+    registerwindow.cpp \
     ressource.cpp \
     statistique.cpp
 
@@ -36,14 +41,17 @@ HEADERS += \
     evenements.h \
     historydialog.h \
     locataire.h \
+    login.h \
     mailing.h \
     mainwindow.h \
     qrcode.h \
     qrcodegen.hpp \
+    registerwindow.h \
     ressource.h \
     statistique.h
 
 FORMS += \
+    login.ui \
     mainwindow.ui \
     statistique.ui
 
@@ -58,3 +66,6 @@ RESOURCES += \
     bell.qrc \
     icons.qrc \
     logo.qrc
+
+DISTFILES += \
+    eye.png
