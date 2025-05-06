@@ -208,7 +208,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (!pixmap2.isNull()) {
         ui->label_7->setPixmap(pixmap2.scaled(ui->label_7->size(), Qt::KeepAspectRatio));
     }*/
-    this->setWindowTitle("Gestion des Boutiques");
+    this->setWindowTitle("Gestini");
 
     // Charger les données au démarrage
     Boutique b;
