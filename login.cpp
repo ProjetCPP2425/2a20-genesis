@@ -33,6 +33,96 @@ LOGIN::LOGIN(QWidget *parent)
     }
 }
 
+
+/*void LOGIN::on_btnLogin_clicked()
+{
+    QString username = ui->lineEdit_username->text();
+    QString mail = ui->mail->text();
+    QString password = ui->lineEdit_password->text();
+
+    QSqlQuery query;
+    query.prepare("SELECT POSTE FROM EMPLOYES WHERE NOM = :username AND EMAIL = :email AND PASSWORD = :password");
+    query.bindValue(":username", username);
+    query.bindValue(":email", mail);
+    query.bindValue(":password", password);
+
+    if(query.exec() && query.next())
+    {
+        QString poste = query.value(0).toString();
+
+        if(poste == "Gestion employees")
+        {
+            // ouvrir page admin
+            AdminWindow *admin = new AdminWindow(this);
+            admin->show();
+            this->close();
+        }
+        else if(poste == "Gestion ressources")
+        {
+            StockWindow *stock = new StockWindow(this);
+            stock->show();
+            this->close();
+        }
+        else if(poste == "Gestion boutiques")
+        {
+            RHWindow *rh = new RHWindow(this);
+            rh->show();
+            this->close();
+        }
+        else if(poste == "Gestion evenement")
+        {
+            ComptaWindow *compta = new ComptaWindow(this);
+            compta->show();
+            this->close();
+        }
+        else if(poste == "Gestion locataires")
+        {
+            SecretaireWindow *sec = new SecretaireWindow(this);
+            sec->show();
+            this->close();
+        }
+        else
+        {
+            QMessageBox::warning(this, "Erreur", "Poste non reconnu.");
+        }
+    }
+    else
+    {
+        QMessageBox::warning(this, "Erreur", "Nom, email ou mot de passe incorrect.");
+    }
+
+
+    // Vérification du format de l'email
+    QRegularExpression emailRegex(R"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)");
+    if (!emailRegex.match(mail).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Adresse email invalide !");
+        return;
+    }
+
+    // Vérification de la complexité du mot de passe (au moins 6 caractères avec une lettre et un chiffre)
+    QRegularExpression pwdRegex("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{6,}$");
+    if (!pwdRegex.match(password).hasMatch()) {
+        QMessageBox::warning(this, "Erreur", "Le mot de passe doit contenir au moins 6 caractères, avec au moins une lettre et un chiffre !");
+        return;
+    }
+
+    if (query.next()) {
+        QString storedMail = query.value("EMAIL").toString();
+        QString storedPassword = query.value("PASSWORD").toString();
+
+        if (storedMail != mail) {
+            QMessageBox::warning(this, "Erreur", "Email incorrect pour ce nom d'utilisateur.");
+        } else if (storedPassword != password) {
+            QMessageBox::warning(this, "Erreur", "Mot de passe incorrect.");
+        }
+    } else {
+        QMessageBox::warning(this, "Erreur", "Nom d'utilisateur incorrect.");
+    }
+}*/
+
+
+
+
 void LOGIN::on_btnLogin_clicked()
 {
     QString username = ui->lineEdit_username->text();
@@ -42,7 +132,7 @@ void LOGIN::on_btnLogin_clicked()
     QSqlQuery query;
 
     // Vérifie si le nom existe
-    query.prepare("SELECT EMAIL, PASSWORD FROM EMPLOYES WHERE NOM = :username");
+    query.prepare("SELECT EMAIL, PASSWORD FROM EMPLOYES WHERE NOM_EM = :username");
     query.bindValue(":username", username);
 
     if (!query.exec()) {
@@ -81,6 +171,8 @@ void LOGIN::on_btnLogin_clicked()
         QMessageBox::warning(this, "Erreur", "Nom d'utilisateur incorrect.");
     }
 }
+
+
 void LOGIN::onShowPasswordToggled(bool checked) {
     ui->lineEdit_password->setEchoMode(checked ? QLineEdit::Normal : QLineEdit::Password);
 }
@@ -94,7 +186,7 @@ void LOGIN::on_btnCreateAccount_clicked()
 
 bool LOGIN::verifySecretAnswer(const QString &nom, const QString &question, const QString &reponse) {
     QSqlQuery query;
-    query.prepare("SELECT REPONSE FROM EMPLOYES WHERE NOM = :nom AND QUESTION = :question");
+    query.prepare("SELECT REPONSE FROM EMPLOYES WHERE NOM_EM = :nom AND QUESTION = :question");
     query.bindValue(":nom", nom);
     query.bindValue(":question", question);
 
@@ -112,7 +204,7 @@ bool LOGIN::verifySecretAnswer(const QString &nom, const QString &question, cons
 }
 void LOGIN::updatePassword(const QString &nom, const QString &newPassword) {
     QSqlQuery query;
-    query.prepare("UPDATE EMPLOYES SET PASSWORD = :pwd WHERE NOM = :nom");
+    query.prepare("UPDATE EMPLOYES SET PASSWORD = :pwd WHERE NOM_EM = :nom");
     query.bindValue(":pwd", newPassword);
     query.bindValue(":nom", nom);
     // Vérification de la complexité du mot de passe (au moins 6 caractères avec une lettre et un chiffre)
@@ -130,7 +222,7 @@ void LOGIN::showPasswordResetDialog() {
     QFormLayout *layout = new QFormLayout(dialog);
 
     QComboBox *nomCombo = new QComboBox(dialog);
-    QSqlQuery query("SELECT DISTINCT NOM FROM EMPLOYES");
+    QSqlQuery query("SELECT DISTINCT NOM_EM FROM EMPLOYES");
     while (query.next()) {
         nomCombo->addItem(query.value(0).toString());
     }

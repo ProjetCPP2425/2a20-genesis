@@ -45,6 +45,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void refreshTable();
+    void afficherRessources();
 
 private slots:
     void onRowSelected();
@@ -71,7 +72,8 @@ private slots:
     void checkUpcomingEvents();
     void showNotification(const QString &message);
 
-    void afficherRessources();
+    //void afficherRessources();
+
     void ajouterRessource();
     void modifierRessource();
     void supprimerRessource();

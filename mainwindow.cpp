@@ -3,6 +3,8 @@
 #include "evenements.h"
 #include "HistoryDialog.h"
 #include "camembertdialog.h"
+#include "arduino.h"
+
 
 #include <QSqlQuery>
 #include <QSqlQueryModel>
@@ -236,7 +238,12 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     // ---------- ARDUINO SETUP ----------
-    arduino = new QSerialPort(this);
+
+    Arduino *arduinoManager = new Arduino(this,this);
+    arduinoManager->setupRFIDConnection("COM9");
+    arduinoManager->setupSurtensionConnection("COM3");
+
+    /*arduino = new QSerialPort(this);
     arduino->setPortName("COM3"); // Adapt as needed
     arduino->setBaudRate(QSerialPort::Baud9600);
     arduino->setDataBits(QSerialPort::Data8);
@@ -249,7 +256,7 @@ MainWindow::MainWindow(QWidget *parent)
         connect(arduino, &QSerialPort::readyRead, this, &MainWindow::readFromArduino);
     } else {
         ui->label_3->setText("Échec de connexion Arduino");
-    }
+    }*/
 
     // ---------- VALIDATION SETUP ----------
     QRegularExpression regexNomType("^[A-Za-zÀ-ÖØ-öø-ÿ\\s]+$");
